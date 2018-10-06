@@ -220,6 +220,7 @@ n_delta = [9.463367e-2, 3.970648e-2, 2.543189e-2, 1.893528e-2, 1.532472e-2,
 
 
 plotErrorVsBeta(alpha,beta,y_delta,n_delta,colors,"alphaBeta_largeGrid/plot_alphaBeta_largeGrid.png")
+plotErrorVsAlpha(alpha,beta,y_delta,n_delta,colors,"alphaBeta_largeGrid/plot_alphaBeta_largeGrid.png")
 
 # This is the one with no delta
 #################################################################

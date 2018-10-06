@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
 from plotHelp import *
 
-colors  = [ "#ff0000", "#ffa600"]
-n_delta = [8.259370e-3,8.345264e-3,8.431157e-3,1.628052e-2,1.644894e-2,1.661735e-2]
-y_delta = [8.322095e-3,8.408637e-3,8.495179e-3,1.640384e-2,1.657352e-2,1.674320e-2]
+n_delta = [8.259370e-3,8.345264e-3,8.431157e-3,1.628052e-2,1.644894e-2,
+           1.661735e-2]
+y_delta = [8.322095e-3,8.408637e-3,8.495179e-3,1.640384e-2,1.657352e-2,
+           1.674320e-2]
 alpha   = [0.01,0.02]
 beta    = [0.02,0.04,0.06]
 
-plotError(alpha,beta,y_delta,n_delta,colors,"alphaBeta_smallGrid/plot_alphaBeta_smallGrid.png")
+#colors  = [ "#ff0000", "#ffa600"]
+#plotErrorVsBeta(alpha,beta,y_delta,n_delta,colors,"alphaBeta_smallGrid/plot_alphaBeta_smallGrid.png")
+
+colors  = [ "#ff0000","#ff5300","#ffa600"]
+plotErrorVsAlpha(alpha,beta,y_delta,n_delta,colors,"alphaBeta_smallGrid/plot_alphaBeta_smallGrid.png")
 
 # This is the one with no delta
 #################################################################

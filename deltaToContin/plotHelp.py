@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+
+def plotError(alpha,beta,y_delta,n_delta,colors,name):
+    plt.figure(num=None, figsize=(8, 6), dpi=100, facecolor='w', edgecolor='k')
+    counter = 0
+    for a in range(len(alpha)):
+        error = []
+        index = len(beta)*a
+        for b in range(len(beta)):
+            y,n = y_delta[index+b], n_delta[index+b]
+            error.append(abs(y-n)/y)
+        plt.plot(beta,error,label="alpha: "+str(alpha[a]),color=colors[counter])
+        counter += 1
+
+    plt.title("Error of Delta vs. Continuous Representation of Single Peak")
+    plt.xlabel("Beta Values")
+    plt.ylabel("Rel. Error")
+    plt.legend(loc='center right')
+
+    plt.savefig(name, bbox_inches='tight')
+    plt.show()
+
+
+

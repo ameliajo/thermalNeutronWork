@@ -8,14 +8,14 @@ def plotErrorVsBeta(alpha,beta,y_delta,n_delta,colors,name):
         index = len(beta)*a
         for b in range(len(beta)):
             y,n = y_delta[index+b], n_delta[index+b]
-            #error.append(abs(y-n)/y)
-            error.append(abs(y-n))
+            error.append(100.0*abs(y-n)/y)
+            #error.append(abs(y-n))
         plt.plot(beta,error,label="alpha: "+str(alpha[a]),color=colors[counter])
         counter += 1
 
     plt.title("Error of Delta vs. Continuous Representation of Single Peak")
     plt.xlabel("Beta Values")
-    plt.ylabel("Rel. Error")
+    plt.ylabel("Rel. Error (%)")
     plt.legend(loc='center right')
 
     plt.savefig(name, bbox_inches='tight')
@@ -31,14 +31,14 @@ def plotErrorVsAlpha(alpha,beta,y_delta,n_delta,colors,name):
         for a in range(len(alpha)):
             index = b+a*len(beta)
             y,n = y_delta[index], n_delta[index]
-            #error.append(abs(y-n)/y)
-            error.append(abs(y-n))
+            error.append(100.0*abs(y-n)/y)
+            #error.append(abs(y-n))
         plt.plot(alpha,error,label="beta: "+str(beta[b]),color=colors[counter])
         counter += 1
 
     plt.title("Error of Delta vs. Continuous Representation of Single Peak")
     plt.xlabel("Alpha Values")
-    plt.ylabel("Rel. Error")
+    plt.ylabel("Rel. Error (%)")
     plt.legend(loc='center right')
 
     plt.savefig(name, bbox_inches='tight')

@@ -2,47 +2,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import integrate
 
-def findAreaUnderDistribution(energy,rho):
+def findArea(energy,rho):
     y_int = integrate.cumtrapz(rho, energy, initial=0)
-    print(y_int)
-    plt.plot(energy,rho,'r')
-    plt.plot(energy,y_int,'b')
-    plt.show()
+    return y_int[-1]
 
 
-def findAreaUnderDelta(energy,rho,delta_i,indexHalfWidth):
-    y_int = integrate.cumtrapz(rho, energy, initial=0)
-    y_int = integrate.cumtrapz(rho[delta_i-indexHalfWidth:delta_i+indexHalfWidth+1], energy[delta_i-indexHalfWidth:delta_i+indexHalfWidth+1], initial=0)
-    return y_int
+def findAreaUnderDelta(energy,delta,delta_i,indexHalfWidth):
+    return integrate.cumtrapz(                                       \
+            delta[ delta_i-indexHalfWidth:delta_i+indexHalfWidth+1], \
+            energy[delta_i-indexHalfWidth:delta_i+indexHalfWidth+1], initial=0)[-1]
 
-
-
-
-def delta(index,delta_i,deltaWgt,spacing):
-    return deltaWgt/spacing if index == delta_i else 0.0
-
-def delta2(index,delta_i,deltaWgt,spacing):
-    return 0.50*deltaWgt/spacing if index == delta_i else \
-           0.25*deltaWgt/spacing if abs(index-delta_i) == 1 else 0.0
-
-def delta3(index,delta_i,deltaWgt,spacing):
-    h = (1/3)
-    return h*deltaWgt/spacing if index == delta_i else \
-           (2*h/3)*deltaWgt/spacing if abs(index-delta_i) == 1 else \
-           (1*h/3)*deltaWgt/spacing if abs(index-delta_i) == 2 else 0.0
-
-def delta4(index,delta_i,deltaWgt,spacing):
-    h = (1/4)
-    return h*deltaWgt/spacing if index == delta_i else \
-           (3*h/4)*deltaWgt/spacing if abs(index-delta_i) == 1 else \
-           (2*h/4)*deltaWgt/spacing if abs(index-delta_i) == 2 else \
-           (1*h/4)*deltaWgt/spacing if abs(index-delta_i) == 3 else 0.0
-
-
+def delta(index,delta_i,deltaWgt,spacing,order):
+    h = (1/order)
+    for distance in range(order):
+        if abs(index-delta_i) == distance: 
+            return ((order-distance)*h/order)*deltaWgt/spacing
+    return 0.0
 
 
 deltaFuncLocation = 0.5
-spacing = 0.05
+spacing = 0.01
 delta_i = int(deltaFuncLocation/spacing)
 endRho = 1.0+spacing
 numSpaces = endRho/spacing
@@ -54,35 +33,33 @@ continWgt = 1.0
 
 
 energy = np.linspace(0,endRho-spacing,numSpaces)
+rho = [0.0]*int(numSpaces)
+numTriangles = 6
+for triangleWidth in range(1,numTriangles):
+    deltaVec = [delta(i,delta_i,deltaWgt,spacing,triangleWidth) for i in range(len(energy))]
+    deltaFuncArea = findAreaUnderDelta(energy,deltaVec,delta_i,triangleWidth)
+    assert(abs(deltaFuncArea - deltaWgt) < 1e-2)
 
-deltaVec = [delta(i,delta_i,deltaWgt,spacing) for i in range(len(energy))]
-plt.plot(energy,deltaVec)
-deltaFuncArea = findAreaUnderDelta(energy,deltaVec,delta_i,1)
-assert(abs(deltaFuncArea[-1] - deltaWgt) < 1e-15)
+    continVec = [continWgt/1.0 for i in range(len(energy))]
+    continArea = findArea(energy,continVec)
+    assert(abs(continArea - continWgt) < 1e-2)
+    
+    for i in range(len(energy)): rho[i] = continVec[i]+deltaVec[i]
+    plt.plot(energy,rho)
 
-deltaVec = [delta2(i,delta_i,deltaWgt,spacing) for i in range(len(energy))]
-plt.plot(energy,deltaVec)
-deltaFuncArea = findAreaUnderDelta(energy,deltaVec,delta_i,2)
-assert(abs(deltaFuncArea[-1] - deltaWgt) < 1e-15)
-
-deltaVec = [delta3(i,delta_i,deltaWgt,spacing) for i in range(len(energy))]
-plt.plot(energy,deltaVec)
-deltaFuncArea = findAreaUnderDelta(energy,deltaVec,delta_i,3)
-assert(abs(deltaFuncArea[-1] - deltaWgt) < 1e-15)
-
-deltaVec = [delta4(i,delta_i,deltaWgt,spacing) for i in range(len(energy))]
-plt.plot(energy,deltaVec)
-deltaFuncArea = findAreaUnderDelta(energy,deltaVec,delta_i,4)
-assert(abs(deltaFuncArea[-1] - deltaWgt) < 1e-15)
-
+    totalArea = findArea(energy,rho)
+    
+    #print(deltaFuncArea,continArea,totalArea)
+    print(energy)
+    print(rho)
 
 
 
-"""
-
-findAreaUnderDistribution(energy,deltaVec)
 
 
 
-"""
+#findAreaUnderDistribution(energy,deltaVec)
+
+
+
 plt.show()

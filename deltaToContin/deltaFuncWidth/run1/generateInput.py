@@ -45,7 +45,7 @@ for triangleWidth in range(1,numTriangles):
     assert(abs(continArea - continWgt) < 1e-2)
     
     for i in range(len(energy)): rho[i] = continVec[i]+deltaVec[i]
-    plt.plot(energy,rho)
+    plt.plot(energy,rho,label="Base Width = "+str(2*triangleWidth*spacing))
 
     totalArea = findArea(energy,rho)
     
@@ -62,4 +62,8 @@ for triangleWidth in range(1,numTriangles):
 
 
 
+plt.title("Mock Freq. Dist. for Single Delta Func. with Small Contin")
+plt.legend(loc="upper right")
+plt.xlabel("Energy (eV)")
+plt.ylabel("Freq. Distribution")
 plt.show()

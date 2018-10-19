@@ -15,7 +15,28 @@ alpha = [1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0]
 beta = [0.01,0.1,1.0,5.0,10.0,15.0,20.0,25.0,30.0,35.0,40.0,50.0]
 
 noDelta = [nDelta_width2,nDelta_width4,nDelta_width6,nDelta_width8,nDelta_width10]
-plotAgainstBetaForGivenAlpha(0,yDelta,noDelta,alpha,beta)
-plotAgainstBetaForGivenAlpha(6,yDelta,noDelta,alpha,beta)
-plotAgainstBetaForGivenAlpha(12,yDelta,noDelta,alpha,beta)
+#plotSabAgainstBetaForGivenAlpha(0,yDelta,noDelta,alpha,beta)
+#plotSabAgainstBetaForGivenAlpha(6,yDelta,noDelta,alpha,beta)
+#plotSabAgainstBetaForGivenAlpha(12,yDelta,noDelta,alpha,beta)
+
+f1 = plt.figure(0)
+for a in [0,3,6,9,12]:
+    error2 = []
+    for b in range(len(beta)):
+        y = yDelta[int(len(beta)*a+b)]
+        error2.append(y)
+    plt.plot(beta,error2,color=color2[a],label=r"$\alpha=$"+str(alpha[a]))
+
+
+    plt.title("Run #1 NJOY-generated S(a,b) using conventional delta input")
+    plt.ylabel("Freq. Dist. Values")
+    plt.xlabel("Beta Values")
+    #x1,x2,y1,y2 = plt.axis()
+    #plt.axis((x1,x2,0.0,0.065))
+
+    plt.legend(loc='center right')
+
+f1.show()
+
+
 input()

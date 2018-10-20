@@ -41,6 +41,36 @@ I generated the pretend phonon distributions using the ``generateInput.py'' code
 \end{figure}
 
 
+\begin{figure}
+\centering
+\includegraphics[width=0.49\textwidth]{run1_sab_alpha_equals_1.png}
+\includegraphics[width=0.49\textwidth]{run1_sab_alpha_equals_4.png}
+\includegraphics[width=0.49\textwidth]{run1_sab_alpha_equals_7.png}
+\caption{\label{fig:run2_comparing_sab_values} The $S(\alpha,\beta)$ results are shown above, after running the simple single-delta function input. This is run for $\alpha=$1.0,4.0, and 7.0 separately. Note that the approximated $S(\alpha,\beta)$ does not seem to follow the delta-function $S(\alpha,\beta)$ well at all. The various widths of triangles seem to have a significant effect on the resultant $S(\alpha,\beta)$.}
+\end{figure}
+
+
+\subsection{Percent Errors}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{run1_error_alpha_equals_1.png}
+\includegraphics[width=0.49\textwidth]{run1_error_alpha_equals_4.png}
+\includegraphics[width=0.49\textwidth]{run1_error_alpha_equals_7.png}
+\caption{\label{fig:run1_error}The percent error between the triangle-approximated delta functions and the real delta function is shown above. }
+\end{figure}
+
+
+\subsection{Absolute Errors}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{run1_absolute_error_alpha_equals_1.png}
+\includegraphics[width=0.49\textwidth]{run1_absolute_error_alpha_equals_4.png}
+\includegraphics[width=0.49\textwidth]{run1_absolute_error_alpha_equals_7.png}
+\caption{\label{fig:run1_abs_error}The absolute error between the triangle-approximated delta functions and the real delta function is shown above. }
+\end{figure}
+
+
+
 \newpage
 
 
@@ -78,7 +108,35 @@ Fig.~\ref{fig:run2_comparing_sab_values} shows the results of $S(\alpha,\beta)$,
 
 
 
+\newpage
 
+\subsection{Percent Errors}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{run2_error_not_scaled_alpha_equals_1.png}
+\includegraphics[width=0.49\textwidth]{run2_error_not_scaled_alpha_equals_4.png}
+\includegraphics[width=0.49\textwidth]{run2_error_not_scaled_alpha_equals_7.png}
+\caption{\label{fig:run2_errorNotScaled}The percent error between the triangle-approximated delta functions and the real delta function is shown above. Note that the different plots have different scales. }
+\end{figure}
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{run2_error_scaled_out_alpha_equals_1.png}
+\includegraphics[width=0.49\textwidth]{run2_error_scaled_out_alpha_equals_4.png}
+\includegraphics[width=0.49\textwidth]{run2_error_scaled_out_alpha_equals_7.png}
+\caption{\label{fig:run2_errorScaled}The percent error between the triangle-approximated delta functions and the real delta function is shown above. These plots are scaled so they all use the same axis bounds. The percent error for larger $\alpha$ values are significantly lower than those of lower $\alpha$ values. }
+\end{figure}
+
+\subsection{Absolute Errors}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{run2_absolute_error_alpha_equals_1.png}
+\includegraphics[width=0.49\textwidth]{run2_absolute_error_alpha_equals_4.png}
+\includegraphics[width=0.49\textwidth]{run2_absolute_error_alpha_equals_7.png}
+\caption{\label{fig:run1_abs_error}The absolute error between the triangle-approximated delta functions and the real delta function is shown above. }
+\end{figure}
 
 
 

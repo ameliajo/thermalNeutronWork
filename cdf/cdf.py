@@ -3,6 +3,7 @@ from results_test_09_300K import *
 #from results_test_09_300K_with_negative_beta import *
 #from results_symBeta import *
 from math import exp
+import numpy as np
 
 
 
@@ -22,7 +23,12 @@ def getEq14(beta,E,T,Sab,A,alphaVec,lenBeta,b):
     validAlphaIndexes = [ i for i in range(len(alphaVec)) if \
                    (alphaVec[i] >= alpha_min and alphaVec[i] <= alpha_max) ]
 
-    numerator = exp(-beta/2) * sum([Sab[i*lenBeta+b] for i in validAlphaIndexes])
+
+    #numerator = exp(-beta/2) * sum([Sab[i*lenBeta+b] for i in validAlphaIndexes])
+    sabVec = [Sab[i*lenBeta+b] for i in validAlphaIndexes]
+    validAlpha = alphaVec[validAlphaIndexes[0]:validAlphaIndexes[-1]+1]
+
+    numerator = exp(-beta/2) * np.trapz([Sab[i*lenBeta+b] for i in validAlphaIndexes],x=alphaVec[validAlphaIndexes[0]:validAlphaIndexes[-1]+1])
     #numerator = sum([Sab[i*lenBeta+b] for i in validAlphaIndexes])
     #if beta < -24.5:
     #    print(exp(-beta/2),numerator)
@@ -50,11 +56,23 @@ for b,beta in enumerate(betas):
     eq14Neg.append(getEq14(-beta,E,T,sab_water,A,alphas,len(betas),b))
 
 
-invTotal = 1.0/(sum(eq14)+sum(eq14Neg))
-eq14    = [ eq14Val * invTotal for eq14Val in eq14    ]
-eq14Neg = [ eq14Val * invTotal for eq14Val in eq14Neg ]
-plt.plot(betas,eq14,'ro-',markersize=2)
-plt.plot([-b for b in betas],eq14Neg,'ro-',markersize=2)
-plt.show()
+#invTotal = 1.0/(sum(eq14)+sum(eq14Neg))
+b2 = betas[:]; b2.reverse()
+fullbetas = [-x for x in b2] + betas
+
+invTotal = 1.0/np.trapz(eq14Neg+eq14,x=fullbetas)
+fullbetas = [x * invTotal for x in fullbetas]
+totaleq14 = eq14Neg+eq14
+plt.plot(fullbetas,totaleq14,'ro-',markersize=2)
+print(fullbetas)
+f=plt.figure(1)
+
+#eq14    = [ eq14Val * invTotal for eq14Val in eq14    ]
+#eq14Neg = [ eq14Val * invTotal for eq14Val in eq14Neg ]
+#plt.plot(betas,eq14,'ro-',markersize=2)
+#plt.plot([-b for b in betas],eq14Neg,'ro-',markersize=2)
+#plt.show()
+f.show()
+input()
 
 

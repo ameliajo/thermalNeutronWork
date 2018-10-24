@@ -25,6 +25,22 @@ bMax = 20.0
 beta = np.linspace(ceil(bMin),bMax,bMax-bMin+1)
 # make sure that beta grid has 0 in it
 
+resultsFile = open("resultsFreeGas.py", "w")
+resultsFile.write("sab_water = [")
+al = np.linspace(0.00001,10,100)
+be = np.linspace(0,20,100)
+for a in al:
+    for b in be:
+        if a == al[-1] and b == be[-1]: resultsFile.write(str(calcSym(a,b))+"]")
+        else:                           resultsFile.write(str(calcSym(a,b))+", ")
+resultsFile.write("\n\n")
+resultsFile.write("alphas = "+str([a for a in al]))
+resultsFile.write("\n\n")
+resultsFile.write("betas = "+str([b for b in be]))
+resultsFile.close()
+
+
+
 bFile = open("betaFreeGas.py", "w")
 #bFile.write("betas = "+str([float("%.5f"%round(b,6)) for b in beta]))
 bFile.write("betas = "+str([b for b in beta]))

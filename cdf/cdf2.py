@@ -50,12 +50,10 @@ posBMin = 0.0
 posBMax = bMax
 
 betaPosVec = [ b for b in betas if (b >= posBMin and b <= posBMax) ]
-for b in range(len(betaPosVec)):
-    beta = betaPosVec[b]
+for b,beta in enumerate(betaPosVec):
     bIndex = betas.index(betaPosVec[b])
-    alphaVec = alphas[bIndex] 
     aMin, aMax = getAlphaMinMax(E,beta,kb,T,A)
-    validAlphas = [ a for a in alphaVec if (a >= aMin and a <= aMax) ]
+    validAlphas = [ a for a in alphas[bIndex] if (a >= aMin and a <= aMax) ]
     
     sabVals = []
     for alpha in validAlphas:
@@ -63,25 +61,19 @@ for b in range(len(betaPosVec)):
         if     sabIsSym and (sab[bIndex][aIndex]-calcSym(alpha,beta))  > 1e-15: print("OH NO")
         if not sabIsSym and (sab[bIndex][aIndex]-calcAsym(alpha,beta)) > 1e-15: print("OH NO")
         sabVals.append(sab[bIndex][aIndex])
-    if sabIsSym:
-        numerator = exp(-0.5*beta)*np.trapz(sabVals,x=validAlphas)
-        eq14Pos.append(numerator)
-    if not sabIsSym:
-        numerator = np.trapz(sabVals,x=validAlphas)
-        eq14Pos.append(numerator)
-
+    if sabIsSym: eq14Pos.append(exp(-0.5*beta)*np.trapz(sabVals,x=validAlphas))
+    else       : eq14Pos.append(               np.trapz(sabVals,x=validAlphas))
+    print(beta,eq14Pos[-1])
  
 eq14Neg = []
 negBMin = 0.0
 negBMax = abs(bMin)
 
 betaNegVec = [ abs(b) for b in betas if (b >= negBMin  and b <= negBMax) ]
-for b in range(len(betaNegVec)):
-    beta = betaNegVec[b]
+for b,beta in enumerate(betaNegVec):
     bIndex = betas.index(-betaNegVec[b])
-    alphaVec = alphas[bIndex] 
     aMin, aMax = getAlphaMinMax(E,-beta,kb,T,A)
-    validAlphas = [ a for a in alphaVec if (a >= aMin and a <= aMax) ]
+    validAlphas = [ a for a in alphas[bIndex] if (a >= aMin and a <= aMax) ]
     
     sabVals = []
     for alpha in validAlphas:
@@ -89,26 +81,22 @@ for b in range(len(betaNegVec)):
         if     sabIsSym and (sab[bIndex][aIndex]-calcSym(alpha,-beta))  > 1e-15: print("OH NO")
         if not sabIsSym and (sab[bIndex][aIndex]-calcAsym(alpha,-beta)) > 1e-15: print("OH NO")
         sabVals.append(sab[bIndex][aIndex])
-    if sabIsSym:
-        numerator = exp(0.5*beta)*np.trapz(sabVals,x=validAlphas)
-        eq14Neg.append(numerator)
-    if not sabIsSym:
-        numerator = np.trapz(sabVals,x=validAlphas)
-        eq14Neg.append(numerator)
+    if sabIsSym: eq14Neg.append(exp(0.5*beta)*np.trapz(sabVals,x=validAlphas))
+    else       : eq14Neg.append(              np.trapz(sabVals,x=validAlphas))
 
 
        
 eq14Neg.reverse()
-print(eq14Neg)
 betaNegVec.reverse()
 eq14 = eq14Neg + eq14Pos
 betaTotal = [-b for b in betaNegVec] + betaPosVec
 invIntegral = 1.0/np.trapz(eq14, x=betaTotal)
 eq14 = [x * invIntegral for x in eq14]
+#print(eq14)
 f = plt.figure(1)
 plt.plot(betaTotal,eq14)
 f.show()
-hold = input()
+#hold = input()
 
 
 if __name__ == "__main__":

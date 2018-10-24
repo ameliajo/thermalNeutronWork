@@ -14,9 +14,9 @@ def calcSym(alpha,beta):
     return exp(beta*0.5)*calcAsym(alpha,beta)
 
 
-A = 1.0     # H2O = 1.01 + 1.01 + 16.00 = 18.02 
-E = 1.0     # 1 eVc
-T = 1000     # 300 K
+A = 1.0   
+E = 1.0    
+T = 1000    
 kb = 8.6173303e-5
 
 bMin = -E/(kb*T)
@@ -27,8 +27,8 @@ beta = np.linspace(ceil(bMin),bMax,bMax-bMin+1)
 
 resultsFile = open("resultsFreeGas.py", "w")
 resultsFile.write("sab_water = [")
-al = np.linspace(0.00001,10,100)
-be = np.linspace(0,20,100)
+al = np.linspace(0,50,101)
+be = np.linspace(0,20,21)
 for a in al:
     for b in be:
         if a == al[-1] and b == be[-1]: resultsFile.write(str(calcSym(a,b))+"]")
@@ -88,14 +88,15 @@ for b in beta:
     #eq14.append(sum([calcAsym(a,b)*(alpha_max-alpha_min)/numAlpha for a in alpha]))
     eq14.append(np.trapz(sabVec,x=alpha))
     #eq14.append(exp(-b/2)*(np.trapz(sabSymVec,x=alpha)))
-    if ( b <= 0 ) : 
-        print(eq14[-1])
+    #if ( b <= 0 ) : 
+    #    print(eq14[-1])
     
     
 aFile.close()
 
 invIntegral = 1.0/np.trapz(eq14, x=beta)
 eq14 = [ x * invIntegral for x in eq14 ]
+print(eq14)
 
 f = plt.figure(1)
 plt.plot(beta,eq14)

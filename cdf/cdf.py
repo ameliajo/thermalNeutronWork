@@ -35,7 +35,6 @@ kb = 8.6173303e-5
 bMin = -E/(kb*T)
 bMax = 20.0
 
-print(bMin)
 
 sabIsSym = True
 sab = sab_water
@@ -45,19 +44,14 @@ posBMin = 0.0
 posBMax = bMax
 
 betaPosVec = [ b for b in betas if (b >= posBMin and b <= posBMax) ]
-print(betaPosVec)
 for b,beta in enumerate(betaPosVec):
     bIndex = betas.index(betaPosVec[b])
     aMin, aMax = getAlphaMinMax(E,beta,kb,T,A)
     validAlphas = [ a for a in alphas if (a >= aMin and a <= aMax) ]
     
-    sabVals = []
-    for alpha in validAlphas:
-        aIndex = alphas.index(alpha)
-        sabVals.append(sab[aIndex*len(betas)+bIndex])
+    sabVals = [ sab[alphas.index(alpha)*len(betas)+bIndex] for alpha in validAlphas ]
     if sabIsSym: eq14Pos.append(exp(-0.5*beta)*np.trapz(sabVals,x=validAlphas))
     else       : eq14Pos.append(               np.trapz(sabVals,x=validAlphas))
-    #print(beta,eq14Pos[-1])
  
 eq14Neg = []
 negBMin = 0.0
@@ -68,55 +62,19 @@ for b,beta in enumerate(betaNegVec):
     bIndex = betas.index(betaNegVec[b])
     aMin, aMax = getAlphaMinMax(E,-beta,kb,T,A)
     validAlphas = [ a for a in alphas if (a >= aMin and a <= aMax) ]
-    
-    sabVals = []
-    for alpha in validAlphas:
-        aIndex = alphas.index(alpha)
-        sabVals.append(sab[aIndex*len(betas)+bIndex])
+    sabVals = [ sab[alphas.index(alpha)*len(betas)+bIndex] for alpha in validAlphas ]
+
     if sabIsSym: eq14Neg.append(exp(0.5*beta)*np.trapz(sabVals,x=validAlphas))
     else       : eq14Neg.append(              np.trapz(sabVals,x=validAlphas))
 
 
        
-eq14Neg.reverse()
-betaNegVec.reverse()
-eq14 = eq14Neg + eq14Pos
-betaTotal = [-b for b in betaNegVec] + betaPosVec
+eq14 = eq14Neg[::-1] + eq14Pos
+betaTotal = [-b for b in betaNegVec[::-1]] + betaPosVec
 invIntegral = 1.0/np.trapz(eq14, x=betaTotal)
 eq14 = [x * invIntegral for x in eq14]
-#print(eq14)
-f = plt.figure(1)
-plt.plot(betaTotal,eq14)
-f.show()
-hold = input()
+print(eq14)
 
-
-"""
-eq14 = []
-eq14Neg = []
-for b,beta in enumerate(betas):
-    eq14.append(getEq14(beta,E,T,sab_water,A,alphas,len(betas),b))
-    eq14Neg.append(getEq14(-beta,E,T,sab_water,A,alphas,len(betas),b))
-
-
-#invTotal = 1.0/(sum(eq14)+sum(eq14Neg))
-b2 = betas[:]; b2.reverse()
-fullbetas = [-x for x in b2] + betas
-
-invTotal = 1.0/np.trapz(eq14Neg+eq14,x=fullbetas)
-fullbetas = [x * invTotal for x in fullbetas]
-totaleq14 = eq14Neg+eq14
-plt.plot(fullbetas,totaleq14,'ro-',markersize=2)
-print(fullbetas)
-f=plt.figure(1)
-
-"""
-#eq14    = [ eq14Val * invTotal for eq14Val in eq14    ]
-#eq14Neg = [ eq14Val * invTotal for eq14Val in eq14Neg ]
-#plt.plot(betas,eq14,'ro-',markersize=2)
-#plt.plot([-b for b in betas],eq14Neg,'ro-',markersize=2)
-#plt.show()
-#f.show()
-#input()
+f = plt.figure(1); plt.plot(betaTotal,eq14); f.show(); input()
 
 

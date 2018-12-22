@@ -16,7 +16,7 @@ def calcSym(alpha,beta):
 
 A = 1.0   
 E = 1.0    
-T = 1000    
+T = 296    
 kb = 8.6173303e-5
 
 bMin = -E/(kb*T)
@@ -28,7 +28,7 @@ beta = np.linspace(ceil(bMin),bMax,bMax-bMin+1)
 resultsFile = open("resultsFreeGas.py", "w")
 resultsFile.write("sab_water = [")
 al = np.linspace(0,50,101)
-be = np.linspace(0,20,21)
+be = np.linspace(0,40,41)
 for a in al:
     for b in be:
         if a == al[-1] and b == be[-1]: resultsFile.write(str(calcSym(a,b))+"]")

@@ -21,7 +21,8 @@ def delta(index,delta_i,deltaWgt,spacing,order):
 
 
 deltaFuncLocation = 0.5
-spacing = 0.01
+#spacing = 0.01
+spacing = 0.1
 delta_i = int(deltaFuncLocation/spacing)
 endRho = 1.0+spacing
 numSpaces = endRho/spacing
@@ -29,12 +30,13 @@ numSpaces = endRho/spacing
 # I want the area of my delta function to be 5
 deltaWgt = 2.0
 # I want the area of my continuous part to be 5
-continWgt = 1.0
+continWgt = 5.0
 
 
 energy = np.linspace(0,endRho-spacing,numSpaces)
 rho = [0.0]*int(numSpaces)
-numTriangles = 6
+#numTriangles = 6
+numTriangles = 2
 for triangleWidth in range(1,numTriangles):
     deltaVec = [delta(i,delta_i,deltaWgt,spacing,triangleWidth) for i in range(len(energy))]
     deltaFuncArea = findAreaUnderDelta(energy,deltaVec,delta_i,triangleWidth)
@@ -45,13 +47,19 @@ for triangleWidth in range(1,numTriangles):
     assert(abs(continArea - continWgt) < 1e-2)
     
     for i in range(len(energy)): rho[i] = continVec[i]+deltaVec[i]
+    plt.plot(energy,rho,'ro',label="Base Width = "+str(2*triangleWidth*spacing))
     plt.plot(energy,rho,label="Base Width = "+str(2*triangleWidth*spacing))
 
     totalArea = findArea(energy,rho)
     
     #print(deltaFuncArea,continArea,totalArea)
+    print("ENERGY")
     print(energy)
+    print("RHO")
     print(rho)
+    print(len(energy))
+    print(len(rho))
+    print()
 
 
 

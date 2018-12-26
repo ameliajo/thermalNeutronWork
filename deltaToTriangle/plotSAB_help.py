@@ -31,6 +31,26 @@ def plotBetaForVariousAlpha(alphaVals,betaVals,sab,A0,E,kbT,scalarMap,style,addL
     plt.ylabel('S(a,b)')
 
 
+def plotBetaForGivenAlpha(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label):
+    alpha = alphaVals[a]
+
+    nalpha, nbeta = len(alphaVals), len(betaVals)
+    # Plotting all beta for given alpha
+    a_i_b_all = sab[a*nbeta:(a+1)*nbeta]
+    validBeta = []
+    validSab  = []
+    for b,beta in enumerate(betaVals):
+        if isValidABCombo(alpha,beta,A0,E,kbT):
+            validBeta.append(beta)
+            validSab.append(a_i_b_all[b])
+    plt.plot(validBeta,validSab,label=label,color=color,marker=style)
+
+
+    plt.xlabel('beta')
+    plt.ylabel('S(a,b)')
+
+
+
 def plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,scalarMap):
 
     nalpha, nbeta = len(alphaVals), len(betaVals)
@@ -50,6 +70,7 @@ def plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,sca
     #plt.legend(loc='best')
     plt.xlabel('beta')
     plt.ylabel('S(a,b) Error (in %)')
+
 
 
 

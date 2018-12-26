@@ -31,7 +31,7 @@ def plotBetaForVariousAlpha(alphaVals,betaVals,sab,A0,E,kbT,scalarMap,style,addL
     plt.ylabel('S(a,b)')
 
 
-def plotBetaForGivenAlpha(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label):
+def plt_SAB_given_A(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label):
     alpha = alphaVals[a]
 
     nalpha, nbeta = len(alphaVals), len(betaVals)
@@ -44,7 +44,6 @@ def plotBetaForGivenAlpha(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label):
             validBeta.append(beta)
             validSab.append(a_i_b_all[b])
     plt.plot(validBeta,validSab,label=label,color=color,marker=style)
-
 
     plt.xlabel('beta')
     plt.ylabel('S(a,b)')

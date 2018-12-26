@@ -44,13 +44,16 @@ EVals_0 = [i0-1,i0,i0+1]
 EVals_1 = [i1-1,i1,i1+1]
 rho[i0] = delta_Weights[0]/spacing
 rho[i1] = delta_Weights[1]/spacing
-#print(E[i1])
-#print(E[i2])
+print(E[i0])
+print(E[i1])
 
 
+#import numpy as np
+#print(len(E))
+#print(np.array(rho))
 
-plt.plot(E,rho)
-plt.show()
+#plt.plot(E,rho)
+##plt.show()
 
 
 

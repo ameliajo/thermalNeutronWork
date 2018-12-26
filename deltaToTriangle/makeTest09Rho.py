@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt 
 from scipy import integrate
+import numpy as np
 
 def findArea(energy,rho):
     y_int = integrate.cumtrapz(rho, energy, initial=0)
@@ -23,43 +24,49 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .04244, .042, 0.0]
 
 
-# Add in the continuous part that we copy from Test09 phonon distribution
-rho = [continRho[i] if i < len(continRho) else 0.0 for i in range(201)]
+def getPhononDist(width,continRho):
 
-# Normalize the continuous part
-contin_Weight  = 0.5
-areaUnderContin = findArea(E,rho)
-rho = [x*contin_Weight/areaUnderContin for x in rho]
+    # Add in the continuous part that we copy from Test09 phonon distribution
+    rho = [continRho[i] if i < len(continRho) else 0.0 for i in range(201)]
 
-
-# Add in the delta function
-delta_Energies = [0.205,0.48]
-delta_Weights  = [0.166667,0.333333]
-
-i0 = int(delta_Energies[0]/spacing)
-i1 = int(delta_Energies[1]/spacing)
+    # Normalize the continuous part
+    contin_Weight  = 0.5
+    areaUnderContin = findArea(E,rho)
+    rho = [x*contin_Weight/areaUnderContin for x in rho]
 
 
-EVals_0 = [i0-1,i0,i0+1]
-EVals_1 = [i1-1,i1,i1+1]
-rho[i0] = delta_Weights[0]/spacing
-rho[i1] = delta_Weights[1]/spacing
-print(E[i0])
-print(E[i1])
+    # Add in the delta function
+    delta_Energies = [0.205,0.48]
+    delta_Weights  = [0.166667,0.333333]
 
+    # Figure out which indices to put my delta functions at
+    i0 = int(delta_Energies[0]/spacing)
+    i1 = int(delta_Energies[1]/spacing)
+    # Check to make sure that they're reasonable
+    #print(E[i0],E[i1])
 
-#import numpy as np
-#print(len(E))
-#print(np.array(rho))
+    i = int(width/2)
+    for j in range(i):
+        rho[i0-j] = (i-j)*delta_Weights[0]/(i**2*spacing)
+        rho[i0+j] = (i-j)*delta_Weights[0]/(i**2*spacing)
+        rho[i1-j] = (i-j)*delta_Weights[1]/(i**2*spacing)
+        rho[i1+j] = (i-j)*delta_Weights[1]/(i**2*spacing)
 
-#plt.plot(E,rho)
-##plt.show()
+    return rho
 
 
 
 
 
 
+if __name__=="__main__":
+    for i in range(2,12,2):
+        plt.plot(E,getPhononDist(i,continRho))
+        print(i)
+        #print(['%.5E'%x for x in getPhononDist(i,continRho)] )
+        print(np.array(getPhononDist(i,continRho)))
+        print()
+    plt.show()
 
 
 

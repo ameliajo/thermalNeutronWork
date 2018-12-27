@@ -71,6 +71,7 @@ ax = plt.gca()
 cb = plt.colorbar(colorBar) # using the colorbar info I got from contourf
 cb.ax.set_ylabel('alpha values')
 plt.title('S(a,b) values for water, generated with and without delta funcs')
+#plt.title('Relative difference between S(a,b) generated with and without delta funcs')
 ax.set_facecolor('xkcd:off white')
 ax.set_facecolor('xkcd:light grey blue')
 plt.show()

@@ -63,12 +63,14 @@ def plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,sca
             if isValidABCombo(alpha,beta,A0,E,kbT):
                 validBeta.append(beta)
                 validSab.append(100.0*(a_i_b_all_Test[b]-a_i_b_all_Good[b])/a_i_b_all_Good[b])
+                #validSab.append(abs(a_i_b_all_Test[b]-a_i_b_all_Good[b]))
         plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a))
 
 
     #plt.legend(loc='best')
     plt.xlabel('beta')
     plt.ylabel('S(a,b) Error (in %)')
+    #plt.ylabel('S(a,b) Absolute Relative Error')
 
 
 

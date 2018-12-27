@@ -138,9 +138,47 @@ We use the phonon distributions generated earlier as input for NJOY, and generat
 
             Let's look at Fig.~\ref{fig:sabThinTriangleAllABZoomed}, which is a zoomed-in version of Fig.~\ref{fig:sabThinTriangleAllAB}. It shows the $S(\alpha,\beta)$ values that were generated using NJOY for H in H$_2$O, wusing the $\delta$ function phonon distribution (dotted lines) and the triangle approximation to $\delta$ functions (solid lines). Note that $S(\alpha,\beta)$ grid that uses the triangle approximation for its higher energy peaks has more of a smear than the one that uses $\delta$ functions, which seems pretty reasonable.
 
+            \begin{figure}[H]
+              \begin{center}
+              \includegraphics[scale=0.6]{sab_thinTriangle_error}
+                \caption{This is the absolute relative error between the $S(\alpha,\beta)$ produced using $\delta$ functions and $S(\alpha,\beta)$ produced using a thin (width = 2 spaces) triangle. Note that the error is very small away from the $\beta\approx8.05$ peak. }
+              \label{fig:sabThinTriangleError}
+              \end{center}
+            \end{figure}
+
+
+
+
+\subsection*{Results: Triangles of Various Widths vs. $\delta$ Func.}
+
+            \begin{figure}[H]
+              \begin{center}
+              \includegraphics[scale=0.6]{diff_widths_alpha_0p5}
+                \caption{}
+              \label{fig:diff_widths_alpha_0p5}
+              \end{center}
+            \end{figure}
+
+              
+              We also look at the total error.
+              \[E_{total}=\sum_{\beta}\sum_\alpha \Big|S^\delta(\alpha,\beta)-S^\triangleleft(\alpha,\beta)\Big|\]
+
+            \begin{figure}[H]
+              \begin{center}
+              \includegraphics[scale=0.6]{diff_widths_total_error}
+                \caption{Note that as the width of the triangle decreases, the total accumulated error decreases significantly.}
+              \label{fig:diff_widths_total_error}
+              \end{center}
+            \end{figure}
+
+
+
+
+
+
+
+
             \clearpage
-
-
 
 %  \bibliographystyle{unsrt}
 %\bibliography{notes}

@@ -60,13 +60,23 @@ def getPhononDist(width,continRho):
 
 
 if __name__=="__main__":
+    """
+    plt.plot(E,getPhononDist(0,continRho),'r')
+    plt.plot([0.205,0.205],[0.0,70.0],'r')
+    plt.plot([0.48,0.48],[0.0,140.0],'r')
+    plt.xlabel('Energy (eV)')
+    plt.ylabel('Freq. Distribution')
+    plt.title('Phonon Distribution for H in H2O (delta functions of arbitrary height)\n as prepared for NJOY 2016 Test09')
+    plt.show()
+    """
+
     for i in range(2,12,2):
-        plt.plot(E,getPhononDist(i,continRho))
+        #plt.plot(E,getPhononDist(i,continRho))
         print(i)
         #print(['%.5E'%x for x in getPhononDist(i,continRho)] )
         print(np.array(getPhononDist(i,continRho)))
         print()
-    plt.show()
+    #plt.show()
 
 
 

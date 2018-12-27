@@ -1,17 +1,6 @@
-from plotSAB_help import *
 import matplotlib.pyplot as plt
-import matplotlib.colors as c
-import matplotlib.cm as cmx
 from generateNjoyInput import *
 import sys
-
-# The point of this is program is to run the H in H2O LEAPR case, at T=296K,
-# with its normal delta-function representation (phonon distribution is 
-# approximated using delta functions at higher energy), as well as with a 
-# similar triangle representation. LEAPR handles triangles different than delta
-# functions, and so I'm looking at how changing the width of the triangles will
-# impact the resultant S(a,b).
-
 
 alphas = [0.001, 0.01, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7 ]
 betas = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.6, 7.7, 7.8, 7.9, 8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 9, 10, 12, 14, 16, 18, 20]
@@ -28,7 +17,6 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
 
 
 
-
 # Define all the different triangle widths we're going to be looking at
 widths = list(range(2,12,2))
 deltaName = 'deltaInput'
@@ -39,7 +27,6 @@ if len(sys.argv) > 1:
     if sys.argv[1] == 'njoy':
         generateNjoyInput(deltaName,alphas,betas,continRho,True)
         runNJOY(deltaName)
-
         for i,width in enumerate(widths):
             generateNjoyInput(fileNames[i],alphas,betas,\
                               getPhononDist(width,continRho),False)
@@ -65,30 +52,13 @@ with open('sabResults/sab_'+str(deltaName)+'.txt','r') as f:
     assert(betas  == getLine(f))
 
 
-
-#cMap = cmx.ScalarMappable(c.Normalize(0,10),plt.get_cmap('tab10')) #hot autumn tab10
-#colors = [cMap.to_rgba(i) for i in range(len(widths)+1)]
-
-error = []
-for i in range(len(widths)):
-    c = sabCONTINS[i]
-    d = sabDELTA
-    error.append(sum([abs(c[i]-d[i]) for i in range(len(c))]))
-    print(i,error[-1])
-
+# Sum over all values in the sab list, take difference
+error = [ sum( [abs(sabCONTIN[j]-sabDELTA[j]) for j in range(len(sabDELTA))] ) \
+          for sabCONTIN in sabCONTINS ]
 
 plt.plot(widths,error,marker='o')
 plt.xlabel('# of spaces spanned by triangle')
 plt.ylabel('Total absolute error')
 plt.title('Total absolute error between S(a,b) generated using delta\nfunctions vs. S(a,b) generated using triangles of various widths')
 plt.show()
-
-#plt.legend(loc='best')
-#ax = plt.gca()
-#plt.title('S(a,b) values for water, generated with delta,\n and with triangles of various widths, for alpha = '+str(alphas[a]))
-#ax.set_facecolor('xkcd:light grey blue')
-#ax.set_facecolor('xkcd:off white')
-
-
-#plt.show()
 

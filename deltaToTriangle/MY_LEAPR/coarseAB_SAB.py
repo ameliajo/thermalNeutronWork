@@ -3,9 +3,13 @@ sys.path.append('../')
 import subprocess
 from makeTest09Rho import *
 from plotSAB_help import *
+import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 
+
+# Things to plot: 
+toPlot = ['delta','2']
 
 
 def getLine(f):
@@ -22,7 +26,7 @@ oscW = [ 0.166667, 0.333333 ]
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'partial' or sys.argv[1] == 'full':
-        deltaName = 'Delta.txt'
+        deltaName = 'sab_Delta.txt'
         writeRho('inputVals.txt',continRho,alphaVals,betaVals,oscE,oscW)
         if sys.argv[1] == 'full':
             subprocess.run(['g++','-std=c++14','deltaFuncLEAPR.cpp'])
@@ -30,7 +34,7 @@ if len(sys.argv) > 1:
         subprocess.run(['mv','inputVals.txt','alphaBetaRhoInputs/'+deltaName])
         subprocess.run(['mv','outputSAB.txt','sabResults/'+deltaName])
 
-        continName = 'Contin2.txt'
+        continName = 'sab_Contin.txt'
         writeRho('inputVals.txt',getPhononDist(2,continRho),alphaVals,betaVals,[],[])
         if sys.argv[1] == 'full':
             subprocess.run(['g++','-std=c++14','deltaFuncLEAPR.cpp'])
@@ -39,10 +43,10 @@ if len(sys.argv) > 1:
         subprocess.run(['mv','outputSAB.txt','sabResults/'+continName])
 
 
-with open('sabResults/Delta.txt','r') as f:
+with open('sabResults/sab_Delta.txt','r') as f:
     sabDELTA  = getLine(f)
 
-with open('sabResults/Contin2.txt','r') as f:
+with open('sabResults/sab_Contin.txt','r') as f:
     sabCONTIN  = getLine(f)
 
 

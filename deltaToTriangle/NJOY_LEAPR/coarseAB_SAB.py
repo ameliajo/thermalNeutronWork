@@ -1,11 +1,15 @@
-import matplotlib.pyplot as plt
 import sys
 sys.path.append('../')
-from plotSAB_help import *
 import subprocess
+from makeTest09Rho import *
+from plotSAB_help import *
+import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 from generateNjoyInput import *
+
+def getLine(f):
+    return [float(num) for num in f.readline().split()]
 
 
 ##############################################################################
@@ -38,9 +42,6 @@ if len(sys.argv) > 1:
         runNJOY(continName)
 
 
-
-def getLine(f):
-    return [float(num) for num in f.readline().split()]
 
 with open('sabResults/sab_Contin.txt','r') as f:
     sabCONTIN = getLine(f)

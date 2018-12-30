@@ -55,8 +55,8 @@ def generateNjoyInput(fileName,alphaVals,betaVals,phononDist,deltaFuncs):
 def runNJOY(fileName):
     subprocess.run(['cp',fileName,'/Users/amelia/NJOY2016/bin'])
     subprocess.call("~/NJOY2016/bin/njoy < "+str(fileName),shell=True)
-    subprocess.run(['mv','./sab.txt','./sabResults/sab_'+fileName+'.txt'])
-    subprocess.run(['mv',fileName,'./njoyInputs/'])
+    subprocess.run(['mv','./sab.txt','./NJOY_LEAPR/sabResults/sab_'+fileName+'.txt'])
+    subprocess.run(['mv',fileName,'./NJOY_LEAPR/njoyInputs/'])
     subprocess.run(['rm','tape24','output'])
 
 

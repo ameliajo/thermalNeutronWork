@@ -17,6 +17,22 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
   double za, awr, spr, aws, sps, delta, twt, c, tbeta, dka, b7;
   std::vector<double> temp_vec,kappa;
 
+  std::cout << "Running Amelia's LEAPR" << std::endl;
+  std::cout << "  Alpha ";
+  for ( auto& a : alpha ) { std::cout << a << " ";}
+  std::cout << "\n  Beta  ";
+  for ( auto& b : beta ) { std::cout << b << " ";}
+  std::cout << "\n  ND    " << nd;
+  std::cout << "\n  Osc E ";
+  for ( auto& b : oscE ) { std::cout << b << " ";}
+  std::cout << "\n  Osc W ";
+  for ( auto& b : oscW ) { std::cout << b << " ";}
+  std::cout << std::endl;
+  std::cout << "\n  Rho   ";
+  for ( auto& b : rho ) { std::cout << b << " ";}
+  std::cout << std::endl;
+
+
 
   int itemp = 0;
   //nout   = 24;                                                        // Card 1
@@ -30,12 +46,23 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
   temp_vec   = { 296.0 };                                               // Card 10 
   delta  = 0.00255;     ni     = 67;                                    // Card 11
                                                                         // Card 12
-  twt    = 0.055556;     c      = 0.0;    tbeta = 0.444444;             // Card 13
-  nd     = 2;                                                           // Card 14
+  twt    = 0.0;     c      = 0.0;    tbeta = 0.5;             // Card 13
+  //nd     = 2;                                                           // Card 14
   //oscE  = { 205.0,    0.48};                                          // Card 15
   //oscW   = { 0.166667, 0.333333 };                                    // Card 16
   nka    = 4;       dka    = 0.01;                                      // Card 17
   kappa  = { 0.1, 0.2, 0.4, 0.7 };                                      // Card 18
+
+
+
+  // If we are running a case with no delta functions, then we want to make sure
+  // that our continuous piece integrates to 1
+  if (nd == 0){ tbeta = 1.0; }
+
+
+  std::cout << "\n  tbeta " << tbeta;
+  std::cout << "\n\n" << std::endl;
+
 
   double bk = 8.617385e-5;
   double therm = 0.0253;
@@ -70,10 +97,20 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
                                 sc, rho, alpha, beta, sym_sab );
   double lambda_s = std::get<0>(lambda_s_t_eff);
   t_eff_vec[itemp] = std::get<1>(lambda_s_t_eff) * temp;
+  std::cout << sym_sab[0][0][0] << std::endl;
+  std::cout << sym_sab[1][1][0] << std::endl;
+  std::cout << sym_sab[2][2][0] << std::endl;
   if ( oscE.size() > 0 ){
+    std::cout << "\n\n\nHERE\n\n\n" << std::endl;
+    std::cout << oscE[0] << "    " << oscE[1] << std::endl;
+    std::cout << oscW[0] << "    " << oscW[1] << std::endl;
   discre( itemp, sc, scaling, tev, lambda_s, twt, tbeta, alpha,
   beta, temp_vec, oscE, oscW, t_eff_vec, sym_sab );
   }
+  std::cout << sym_sab[0][0][0] << std::endl;
+  std::cout << sym_sab[1][1][0] << std::endl;
+  std::cout << sym_sab[2][2][0] << std::endl;
+
 
   return sym_sab;
 }
@@ -98,8 +135,13 @@ int main() {
   std::vector<double> alphaVals = v2[0];
   std::vector<double> betaVals  = v2[1];
   std::vector<double> rhoVals   = v2[2];
-  int nd = 0;
-  auto sym_sab = runLEAPR(alphaVals,betaVals,rhoVals,nd);
+  std::vector<double> oscE, oscW;
+  if (v2.size() > 3){
+    oscE = v2[3];
+    oscW = v2[4];
+  }
+  int nd = oscE.size();
+  auto sym_sab = runLEAPR(alphaVals,betaVals,rhoVals,nd,oscE,oscW);
   std::ofstream outFile("outputSAB.txt");
   for (const auto& a : sym_sab){
     for (const auto& b : a){

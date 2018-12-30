@@ -54,17 +54,18 @@ def getPhononDist(width,continRho):
 
 
 
-def writeRho(fileName,width,continRho,alphaVals,betaVals):
-    realRho = getPhononDist(width,continRho)
-    with open('inputVals.txt','w') as f:
+def writeRho(fileName,rho,alphaVals,betaVals,oscE,oscW):
+    with open(fileName,'w') as f:
         for a in alphaVals: f.write(str(a)+" ")
         f.write('\n')
         for b in betaVals: f.write(str(b)+" ")
         f.write('\n')
-        for r in realRho: f.write(str(r)+" ")
+        for r in rho: f.write(str(r)+" ")
         f.write('\n')
-
-
+        for r in oscE: f.write(str(r)+" ")
+        f.write('\n')
+        for r in oscW: f.write(str(r)+" ")
+        f.write('\n')
 
 
 

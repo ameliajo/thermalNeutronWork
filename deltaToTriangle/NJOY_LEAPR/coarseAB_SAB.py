@@ -1,6 +1,7 @@
-from plotSAB_help import *
 import matplotlib.pyplot as plt
 import sys
+sys.path.append('../')
+from plotSAB_help import *
 import subprocess
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
@@ -20,8 +21,8 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
   .04244, .042, 0.0]
 
-alphas = [0.5,0.6,0.7]
-betas = [7.9, 8, 8.05, 8.1, 8.15]
+#alphas = [0.5,0.6,0.7]
+#betas = [7.9, 8, 8.05, 8.1, 8.15]
 
 
 
@@ -67,7 +68,7 @@ plt.clf()
 #print(sabDELTA)
 
 plotBetaForVariousAlpha(alphaVals,betaVals,sabDELTA,A0,E,kbT,scalarMap,'.',False)
-#plotBetaForVariousAlpha(alphaVals,betaVals,sabCONTIN,A0,E,kbT,scalarMap,'.',True)
+plotBetaForVariousAlpha(alphaVals,betaVals,sabCONTIN,A0,E,kbT,scalarMap,'.',True)
 #plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabDELTA,sabCONTIN,A0,E,kbT,scalarMap)
 
 

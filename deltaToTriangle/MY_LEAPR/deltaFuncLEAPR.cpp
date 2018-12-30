@@ -97,19 +97,11 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
                                 sc, rho, alpha, beta, sym_sab );
   double lambda_s = std::get<0>(lambda_s_t_eff);
   t_eff_vec[itemp] = std::get<1>(lambda_s_t_eff) * temp;
-  std::cout << sym_sab[0][0][0] << std::endl;
-  std::cout << sym_sab[1][1][0] << std::endl;
-  std::cout << sym_sab[2][2][0] << std::endl;
+
   if ( oscE.size() > 0 ){
-    std::cout << "\n\n\nHERE\n\n\n" << std::endl;
-    std::cout << oscE[0] << "    " << oscE[1] << std::endl;
-    std::cout << oscW[0] << "    " << oscW[1] << std::endl;
-  discre( itemp, sc, scaling, tev, lambda_s, twt, tbeta, alpha,
-  beta, temp_vec, oscE, oscW, t_eff_vec, sym_sab );
+    discre( itemp, sc, scaling, tev, lambda_s, twt, tbeta, alpha,
+    beta, temp_vec, oscE, oscW, t_eff_vec, sym_sab );
   }
-  std::cout << sym_sab[0][0][0] << std::endl;
-  std::cout << sym_sab[1][1][0] << std::endl;
-  std::cout << sym_sab[2][2][0] << std::endl;
 
 
   return sym_sab;

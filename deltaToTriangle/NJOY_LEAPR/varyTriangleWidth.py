@@ -1,9 +1,10 @@
+import sys
+sys.path.append('../')
 from plotSAB_help import *
 import matplotlib.pyplot as plt
 import matplotlib.colors as c
 import matplotlib.cm as cmx
 from generateNjoyInput import *
-import sys
 
 # The point of this is program is to run the H in H2O LEAPR case, at T=296K,
 # with its normal delta-function representation (phonon distribution is 

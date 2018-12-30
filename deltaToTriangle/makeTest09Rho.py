@@ -56,6 +56,21 @@ def getPhononDist(width,continRho):
 
 
 
+def writeRho(fileName,rho,alphaVals,betaVals,oscE,oscW):
+    with open(fileName,'w') as f:
+        for a in alphaVals: f.write(str(a)+" ")
+        f.write('\n')
+        for b in betaVals: f.write(str(b)+" ")
+        f.write('\n')
+        for r in rho: f.write(str(r)+" ")
+        f.write('\n')
+        for r in oscE: f.write(str(r)+" ")
+        f.write('\n')
+        for r in oscW: f.write(str(r)+" ")
+        f.write('\n')
+
+
+
 
 
 

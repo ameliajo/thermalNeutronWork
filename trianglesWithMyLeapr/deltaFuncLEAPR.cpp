@@ -1,6 +1,112 @@
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+
+
+
+int main() {
+  std::string line;
+  int i = 0;
+  std::vector<std::string> v;
+  std::vector<std::vector<double>> v2;
+  std::ifstream fin;
+  double val;
+  fin.open( ( "inputVals.txt" ) );
+  if ( fin.is_open()) {
+    while ( getline ( fin, line )) {
+      std::vector<double> thisVec {};
+      std::stringstream ss ( line );
+      while (ss >> val){
+        thisVec.push_back(val);
+      }
+      //for ( auto x : thisVec ){ std::cout << x << std::endl; }
+      if (thisVec.size() > 0){ v2.push_back(thisVec);}
+      //if ( getline ( ss, line, ',')) {
+      //  v.push_back( line );
+     // }
+    }
+    for ( auto x : v2[0] ){ std::cout << x << std::endl; }
+    for ( auto x : v2[1] ){ std::cout << x << std::endl; }
+    //for ( auto x : v2[2] ){ std::cout << x << std::endl; }
+  }
+  return 0;
+}
+
+  /*
+std::vector<double> vec; 
+std::vector<std::string> y;
+std::ifstream file("inputVals.txt");
+if (file.is_open()) {
+    std::string line;
+    while (getline(file, line)) {
+      
+        std::cout << line << std::endl;
+        printf("%s", line.c_str());
+        std::cout << '\n' << std::endl;
+        y.push_back(line);
+    }
+    file.close();
+}
+    //std::vector<double> alphaVals;
+    //for (std::string x : y){
+    //  std::cout << x << std::endl;
+    //  alphaVals.push_back(stod(x));
+   // }
+
+return 0;
+}
+*/
+  /*
+  std::vector<double> rainfall;    // a vector to hold rainfall data
+  std::ifstream inputFile("inputVals.txt");
+  if (inputFile) {
+      double val1 = 0; 
+      while ( inputFile >> val1) {
+        //std::cout << val1 << std::endl;
+        rainfall.push_back(val1);
+  }
+  for ( auto x : rainfall){ std::cout << x << std::endl; }
+  }
+  
+  return 0;
+}
+*/
+
+
+     // close the file
+
+
+      /*
+  std::vector<std::string> my_arr;
+  std::ifstream dict_file("inputVals.txt");
+  std::string line;
+
+  while(std::getline(dict_file, line)) {
+     new_line;
+    new_line = line + "\n";
+    my_arr.push_back(new_line);
+  }
+
+  //std::vector<double> alphaVals = my_arr[0];
+  //std::vector<double> betaVals = my_arr[1];
+  //std::vector<double> rhoVals = my_arr[2];
+  //for ( auto x : alphaVals ){ std::cout << x << std::endl; }
+  return 0;
+}
+
+
+
+*/
+
+/*
 //#include "leapr.cpp"
 #include <iostream>
 #include "/Users/amelia/Dropbox (MIT)/Senior Fall/Masters/LEAPR/leapr/src/contin/contin.h"
+#include <fstream>
+
 
 int main() {
   std::cout << "Hello world!" << std::endl;
@@ -83,3 +189,4 @@ int main() {
 
   return 0;
 }
+*/

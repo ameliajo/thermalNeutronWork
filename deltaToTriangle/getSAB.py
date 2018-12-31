@@ -19,7 +19,7 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
     # width of triangle. if None, then we treat it as a delta function
     if NJOY_LEAPR:
         # Run NJOY LEAPR
-        name = 'Delta' if width == None else 'Contin'
+        name = 'Delta' if width == None else 'Contin'+str(width)
         if fullRedo:
             # Generate S(a,b) using delta functions OR 
             # Generate S(a,b) by approximating delta functions as a very thin triangle
@@ -38,7 +38,7 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
 
     else:
         # Run my own LEAPR
-        name = 'sab_Delta.txt' if width == None else 'sab_Contin.txt'
+        name = 'sab_Delta.txt' if width == None else 'sab_Contin'+str(width)+'.txt'
         if fullRedo:
             if width == None:
                 assert(oscE != None and oscW != None)

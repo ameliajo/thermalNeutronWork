@@ -1,4 +1,3 @@
-
 from getSAB import *
 from plotSAB_help import *
 import matplotlib.pyplot as plt
@@ -27,55 +26,39 @@ def finishPlotting(colorBar,title):
 
 
 
+def runAlphasBetas(opt0,opt1,alphas,betas,continRho,oscE,oscW,fullRedo=False):
+    useNJOY1 = True if opt0[0] == 'njoy' else False if opt0[0] == 'mine' else None
+    useNJOY2 = True if opt1[0] == 'njoy' else False if opt1[0] == 'mine' else None
+    width0, width1 = opt0[1], opt1[1]
 
-def runAlphasBetas(option,alphas,betas,continRho,oscE,oscW,fullRedo=False):
-    # Option
-    # (1)  My  LEAPR delta function vs NJOY LEAPR delta function
-    # (2)  My  LEAPR thin triangle  vs NJOY LEAPR thin triangle
-    # (3)  My  LEAPR delta function vs  MY  LEAPR thin triangle
-    # (4) NJOY LEAPR delta function vs NJOY LEAPR thin triangle
+    assert useNJOY1 != None and useNJOY2 != None, \
+           'Invalid identifiers. Use either "mine" or "njoy" for LEAPR type'
+    assert useNJOY1 != useNJOY2 or width0 != width1,\
+           'Comparing two identical cases'
 
-    A0 = 18.02
-    E = 0.01 
-    kbT = 0.025851
-
-    titleIntro = 'S(a,b) for H in H2O, generated with '
-    titleErrorIntro = 'S(a,b) error for H in H2O, generated with '
-
-    if option == 1: # MY LEAPR DELTA FUNCS VS NJOY LEAPR DELTA FUNCS
-        NJOY_LEAPR_1 = False; width_1 = None
-        NJOY_LEAPR_2 = True;  width_2 = None
-        title = 'my\nLEAPR vs. NJOY LEAPR. Using delta function approx.'
-
-    if option == 2: # MY LEAPR CONTIN2 FUNCS VS NJOY LEAPR CONTIN2 FUNCS
-        NJOY_LEAPR_1 = False; width_1 = 2
-        NJOY_LEAPR_2 = True;  width_2 = 2 
-        title = 'my\nLEAPR vs. NJOY LEAPR. Using thin triangle approx.'
-
-    if option == 3: # MY LEAPR DELTA FUNCS VS MY LEAPR CONTIN2 FUNCS
-        NJOY_LEAPR_1 = False; width_1 = None 
-        NJOY_LEAPR_2 = False; width_2 = 2 
-        title = 'my LEAPR.\nUsing delta func. approx vs. thin triangle approx.'
- 
-    if option == 4: # NJOY LEAPR DELTA FUNCS VS NJOY LEAPR CONTIN2 FUNCS
-        NJOY_LEAPR_1 = True; width_1 = None 
-        NJOY_LEAPR_2 = True; width_2 = 2 
-        title = 'NJOY LEAPR.\nUsing delta func. approx vs. thin triangle approx.'
+    if useNJOY1 == useNJOY2:
+        title  = 'NJOY' if useNJOY1 else 'my'
+        title += ' LEAPR.\nUsing delta func. approx vs thin triangle approx.'
+    else:
+        assert width0 == width1, 'If comparing different widths, use same LEAPR'
+        title  = 'my\nLEAPR vs NJOY LEAPR. Using '
+        title += 'delta function approx.' if width0 == None else 'thin triangle approx.'
+    A0 = 18.02; E = 0.01; kbT = 0.025851
 
     scalarMap, colorBar = prepPlot()
     ########################################################################
     # Generate specified S(a,b)
-    SAB_1 = getSAB(alphas,betas,continRho,NJOY_LEAPR_1,fullRedo,width_1,oscE,oscW)
-    SAB_2 = getSAB(alphas,betas,continRho,NJOY_LEAPR_2,fullRedo,width_2,oscE,oscW)
+    SAB_1 = getSAB(alphas,betas,continRho,useNJOY1,fullRedo,width0,oscE,oscW)
+    SAB_2 = getSAB(alphas,betas,continRho,useNJOY2,fullRedo,width1,oscE,oscW)
     ########################################################################
     # Compare S(a,b) values
     plotBetaForVariousAlpha(alphas,betas,SAB_1,A0,E,kbT,scalarMap,'.',False)
     plotBetaForVariousAlpha(alphas,betas,SAB_2,A0,E,kbT,scalarMap,'.',True)
-    finishPlotting(colorBar,titleIntro+title)
+    finishPlotting(colorBar,'S(a,b) for H in H2O, generated with '+title)
     ########################################################################
     # Compare S(a,b) errors
     plotErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
-    finishPlotting(colorBar,titleErrorIntro+title)
+    finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
     ########################################################################
 
 
@@ -97,14 +80,15 @@ if __name__=="__main__":
     oscE = [ 0.204,    0.4794   ] 
     oscW = [ 0.166667, 0.333333 ]
 
-    question = \
-    " (1)  My  LEAPR delta function vs NJOY LEAPR delta function \n" + \
-    " (2)  My  LEAPR thin triangle  vs NJOY LEAPR thin triangle \n"  + \
-    " (3)  My  LEAPR delta function vs  MY  LEAPR thin triangle \n"  + \
-    " (4) NJOY LEAPR delta function vs NJOY LEAPR thin triangle \n"  + \
-    "What option do you want?: "
+    opt0,opt1 = ('mine',None),('mine',2) # Works
+    opt0,opt1 = ('njoy',None),('njoy',2) # Works
+    opt0,opt1 = ('mine',None),('njoy',None) # Works
+    #opt0,opt1 = ('mine',2),('njoy',2) # Works
+    #opt0,opt1 = ('mine',None),('njoy',2) # FAILS, diagonal comparison
+    #opt0,opt1 = ('njoy',None),('mine',2) # FAILS, diagonal comparison
+    #opt0,opt1 = ('mine',None),('mine',None) # FAILS, identical
+    #opt0,opt1 = ('njoy',2),('njoy',2) # FAILS, identical
+    #opt0,opt1 = ('test',None),('njoy',2) # FAILS, bad LEAPR identifier
+    runAlphasBetas(opt0,opt1,alphas,betas,continRho,oscE,oscW)
 
-
-    option = int(input(question))
-    runAlphasBetas(option,alphas,betas,continRho,oscE,oscW)
 

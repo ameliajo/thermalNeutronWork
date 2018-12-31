@@ -31,7 +31,7 @@ def plotBetaForVariousAlpha(alphaVals,betaVals,sab,A0,E,kbT,scalarMap,style,addL
     plt.ylabel('S(a,b)')
 
 
-def plt_SAB_given_A(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label):
+def plt_SAB_given_A(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label,linewidth=1):
     alpha = alphaVals[a]
 
     nalpha, nbeta = len(alphaVals), len(betaVals)
@@ -43,7 +43,7 @@ def plt_SAB_given_A(alphaVals,a,betaVals,sab,A0,E,kbT,color,style,label):
         if isValidABCombo(alpha,beta,A0,E,kbT):
             validBeta.append(beta)
             validSab.append(a_i_b_all[b])
-    plt.plot(validBeta,validSab,label=label,color=color,marker=style)
+    plt.plot(validBeta,validSab,label=label,color=color,marker=style,linewidth=linewidth)
 
     plt.xlabel('beta')
     plt.ylabel('S(a,b)')

@@ -83,7 +83,7 @@
 			LEAPR uses each component of this decomposed frequency distribution to create a corresponding scattering law $S_{sym,i}(\alpha,\beta,T)$, then convolves these individual scattering laws to retreive the true scattering relation $S_{n.sym}(\alpha,\beta,T)$.
 
 			\subsubsection{Solid-Type Continuous Spectra}
-				The solid-type continuous conribution to $S_{n.sym}(\alpha,\beta,T)$ can be calculated by representing Eq.~\ref{eq:sabIntegralWithGamma} as a sum, and using a finite number of terms of that sum to approximate a contribution value. The solid-type continuous spectra depends on the frequency distributino $\rho(\beta)$.
+                                The solid-type continuous conribution to $S_{n.sym}(\alpha,\beta,T)$, denoted with an $(s)$ superscript, can be calculated by representing Eq.~\ref{eq:sabIntegralWithGamma} as a sum, and using a finite number of terms of that sum to approximate a contribution value. The solid-type continuous spectra depends on the frequency distributino $\rho(\beta)$.
 				Eq.~\ref{eq:gamma} can be rewritten as 
 				\begin{equation} 
 					\gamma(\hat{t})=\alpha\lambda_s-\alpha\int_{-\infty}^{\infty}P(\beta)\mathrm{e}^{-\beta/2}\mathrm{e}^{-i\beta\hat{t}}~d\beta.\label{eq:improvedGamma}
@@ -98,9 +98,7 @@
 				\end{equation}
 				where the exponential of the latter term has been represented as a Taylor series. The above can be used in Eq.~\ref{eq:sabIntegralWithGamma}, yielding
 				\begin{align}
-					S_{n.sym}(\alpha,\beta,T)=~&\frac{1}{2\pi}\int_{-\infty}^{\infty}\mathrm{e}^{i\beta\hat{t}}\sum_{n=0}^\infty\left(\mathrm{e}^{-\alpha\lambda_s}\frac{1}{n!}\left[\alpha\int_{-\infty}^{\infty}P(\beta')\mathrm{e}^{-\beta'/2}\mathrm{e}^{-i\beta'\hat{t}}~d\beta'\right]^n\right)~d\hat{t}\\
-				% \end{align}
-				% \begin{align}
+                                       S^{(s)}_{n.sym}(\alpha,\beta,T)=~&\frac{1}{2\pi}\int_{-\infty}^{\infty}\mathrm{e}^{i\beta\hat{t}}\sum_{n=0}^\infty\left(\mathrm{e}^{-\alpha\lambda_s}\frac{1}{n!}\left[\alpha\int_{-\infty}^{\infty}P(\beta')\mathrm{e}^{-\beta'/2}\mathrm{e}^{-i\beta'\hat{t}}~d\beta'\right]^n\right)~d\hat{t}\\
 					=~&\mathrm{e}^{-\alpha\lambda_s}\sum_{n=0}^\infty\frac{\alpha^n}{n!}\frac{1}{2\pi}\int_{-\infty}^{\infty}\mathrm{e}^{i\beta\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta')\mathrm{e}^{-\beta'/2}\mathrm{e}^{-i\beta'\hat{t}}~d\beta'\right]^n~d\hat{t}\\
 					% =~&\mathrm{e}^{-\alpha\lambda_{s}}\sum_{n=0}^{\infty}\frac{\alpha^n}{n!}\lambda_{s}^{n}\mathcal{T}_{n}(\beta)\\
 					=~&\mathrm{e}^{-\alpha\lambda_{s}}\sum_{n=0}^{\infty}\frac{1}{n!}\left[\alpha\lambda_{s}\right]^{n}\mathcal{T}_{n}(\beta)\label{eq:sumToGetToContinSab}
@@ -122,7 +120,7 @@
 				\end{align}
 				As shown in Appendix~\ref{app:TnConvolutionDeriv}, $\mathcal{T}_n(\beta)$ can be attained using a convolution integral,
 				\begin{equation}
-					\mathcal{T}_{n}(\beta)=\int_{-\infty}^{\infty}\mathcal{T}_{1}\left(\beta^{\prime}\right)\mathcal{T}_{n-1}\left(\beta-\beta^{\prime}\right)d\beta^{\prime}\tag{\ref{ap:eq:finalTn}}.
+					\mathcal{T}_{n}(\beta)=\int_{-\infty}^{\infty}\mathcal{T}_{1}\left(\beta'\right)\mathcal{T}_{n-1}\left(\beta-\beta'\right)d\beta'\tag{\ref{ap:eq:finalTn}}.
 				\end{equation}
 				Solving the solid-type, continuous contribution to $S_{n.sym}(\alpha,\beta,T)$ can be done by computing $\mathcal{T}_i(\beta)$ for $i$ from 1 to a sufficiently large value of $n$. These $\mathcal{T}_i(\beta)$ values can be used in the Eq.~\ref{eq:sumToGetToContinSab}, which directly contributes to $S_{n.sym}(\alpha,\beta,T)$.
 
@@ -136,24 +134,40 @@
 				    \caption[Phonon Distribution for H in H$_2$O]{Phonon Distribution for H in H$_2$O~\cite{phononModel}. The red points and the arrows represent measured data against which to compare the calculated spectrum. Of particular interest are the two peaks near 200 and 400 meV, which are approximated in LEAPR as discrete oscillators.}
 				    \label{fig:phononDist}
 				\end{figure}
-                                Often, vibrational modes appear as sharp peaks in the frequency distribution, and can be treated as a weighted delta function at energy $E$, $\omega_i\delta_i(E)$. The corresponding 
+                                Often, vibrational modes appear as sharp peaks in the frequency distribution, and can be treated as a weighted delta functions, $\omega_i\delta_i(E)$. The contribution to the scattering law from oscillator $i$ is 
 				\begin{equation}
-					\mathcal{S}_{i}(\alpha,\beta)=\mathrm{e}^{-\alpha\lambda_{i}}\sum_{n=-\infty}^{\infty}\delta\left(\beta-n\beta_{i}\right)I_{n}\left[\frac{\alpha w_{i}}{\beta_{i}\sinh\left(\beta_{i}/2\right)}\right]\mathrm{e}^{-n\beta_{i}/2}
+                                  S^{(i)}_{n.sym}(\alpha,\beta)=\mathrm{e}^{-\alpha\lambda_{i}}\sum_{n=-\infty}^{\infty}\delta\left(\beta-n\beta_{i}\right)\mathrm{I}_{n}\left[\frac{\alpha w_{i}}{\beta_{i}\sinh\left(\beta_{i}/2\right)}\right]\mathrm{e}^{-n\beta_{i}/2}\label{eq:longDeltaFunctionSAB}
 				\end{equation}
-				\begin{equation}
-					\mathcal{S}_{i}(\alpha,\beta)=\sum_{n=-\infty}^{\infty}A_{in}(\alpha)\delta\left(\beta-n\beta_{i}\right)
-				\end{equation}
+                                where the corresponding Debye-Waller coefficient is 
                                 \begin{equation}
                                         \lambda_{i}=w_{i}\frac{\operatorname{coth}\left(\beta_{i}/2\right)}{\beta_{i}}
                                 \end{equation}
-                                where $\lambda_i$ is the Debye-Waller coefficient corresponding to the $i^{th}$ oscillator. When combining a continuous, solid-type spectrum with discrete oscillators, the total Debye-Waller coefficient is simply the sum,
+                                and $\mathrm{I}_n(x)$ is the Modified Bessel function of the first kind. When combining a continuous, solid-type spectrum with discrete oscillators, the total Debye-Waller coefficient is simply the sum,
                                 \begin{equation}
                                         \lambda=\lambda_{s}+\sum_{i=1}^{N}\lambda_{i}
                                 \end{equation}
-                                where there are $N$ oscilllators considered.
+                                where there are $N$ oscilllators considered. Combining all the factors in Eq.~\ref{eq:longDeltaFunctionSAB} without a $\beta$ term leaves us with
+				\begin{equation}
+                                  S^{(i)}_{n.sym}(\alpha,\beta)=\sum_{n=-\infty}^{\infty}A_{i,n}(\alpha)\delta\left(\beta-n\beta_{i}\right)\label{eq:shortDeltaFunctionSAB}
+				\end{equation}
+                                where $A_{i,n}(\alpha)$ is defined as 
+                                \begin{equation}
+                                  A_{i,n}(\alpha)=\mathrm{e}^{-\alpha\lambda_i}\mathrm{I}_n\left[\frac{\alpha\omega_i}{\beta_i\sinh(\beta_i/2)}\right]e^{-n\beta_i/2}.
+                                \end{equation}
+                                Using Eq.~\ref{eq:longDeltaFunctionSAB} or Eq.~\ref{eq:shortDeltaFunctionSAB}, the contribution that an individual oscillator has to the total scattering law is rather simple to compute. Once computed, it must be convoled with the existing scattering law. Consider an example where two discrete oscillators contributions, $S^{(1)}_{n.sym}$ and $S^{(2)}_{n.sym}$, are being combined to a scattering law contribution from solid type spectrum $S^{(s)}_{n.sym}$.
 
-%Polyatomic molecules normally contain a number of vibrational modes that can be represented as discrete oscillators. The distribu- tion function for one oscillator is given by wiδ(βi), where wi is the fractional weight for mode i, and βi is the energy-transfer parameter computed from the mode’s vibrational frequency. The corresponding scattering law is given by
-
+                                \begin{align}
+                                  S^{(s,1)}_{n.sym}(\alpha,\beta)=&\int_{-\infty}^{\infty}S^{(1)}_{n.sym}\left(\alpha,\beta'\right)S^{(s)}_{n.sym}\left(\alpha,\beta-\beta'\right)d\beta'\\
+                                  =&\int_{-\infty}^{\infty}\sum_{n=-\infty}^{\infty}A_{1,n}(\alpha)\delta\left(\beta'-\beta_1\right)S^{(s)}_{n.sym}\left(\alpha,\beta-n\beta'\right)d\beta'\\
+                                  =&\sum_{n=-\infty}^{\infty}A_{1,n}(\alpha)S^{(s)}_{n.sym}\left(\alpha,\beta-n\beta_1\right)
+                                \end{align}
+                                \begin{align}
+                                  S^{(s,1,2)}_{n.sym}(\alpha,\beta)=&\int_{-\infty}^{\infty}S^{(2)}_{n.sym}\left(\alpha,\beta'\right)S^{(s,1)}_{n.sym}\left(\alpha,\beta-\beta'\right)d\beta'\\
+                                  =&\int_{-\infty}^{\infty}\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)\delta\left(\beta'-m\beta_2\right)S^{(s,1)}_{n.sym}\left(\alpha,\beta-\beta'\right)d\beta'\\
+                                  =&\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)S^{(s,1)}_{n.sym}\left(\alpha,\beta-m\beta_2\right)\\
+                                  =&\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)\sum_{n=-\infty}^{\infty}A_{1,n}(\alpha)S^{(s)}_{n.sym}\left(\alpha,\beta-n\beta_1-m\beta_2\right)
+\\
+                                \end{align}
 
 
 
@@ -161,6 +175,35 @@
 
 			
 			\subsubsection{Translational Spectra}
+
+                            \begin{align}
+                                \mathcal{S}_{t}(\alpha,\beta)=&\frac{2cw_{t}\alpha}{\pi}\exp\left[2c^{2}w_{t}\alpha-\beta/2\right]\\
+                                &\frac{\sqrt{c^{2}+.25}}{\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}}K_{1}\left\{\sqrt{c^{2}+.25}\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}\right\}
+                            \end{align}
+
+                            
+                            \begin{equation}
+                              \rho(\beta)=w_{t}\frac{4c}{\pi\beta}\sqrt{c^{2}+.25}\sinh(\beta/2)K_{1}\left\{\sqrt{c^{2}+.25}\beta\right\}
+                            \end{equation}
+
+
+                            \begin{equation}
+                              \mathcal{S}_{t}(\alpha,-\beta)=\frac{1}{\sqrt{4\pi w_{t}\alpha}}\exp\left[-\frac{\left(w_{t}\alpha-\beta\right)^{2}}{4w_{t}\alpha}\right]
+                            \end{equation}
+
+                            \begin{equation}
+                              \mathcal{S}_{t}(\alpha,\beta)=\mathrm{e}^{-\beta}\mathcal{S}_{t}(\alpha,-\beta)
+                            \end{equation}
+
+
+                            \begin{equation}
+                              \mathcal{S}(\alpha,\beta)=\mathcal{S}_{t}(\alpha,\beta)\mathrm{e}^{-\alpha\lambda_{s}}+\int_{-\infty}^{\infty}\mathcal{S}_{t}\left(\alpha,\beta^{\prime}\right)\mathcal{S}_{s}\left(\alpha,\beta-\beta^{\prime}\right)d\beta^{\prime}
+                            \end{equation}
+
+
+
+
+
 
 	\section{Areas of Improvement}
 		\subsection{Input Phonon Distribution Approximations}

@@ -1,0 +1,42 @@
+\documentclass[../master.tex]{subfiles}
+
+\begin{document}
+\chapter{Background}
+\section{$T_n(\beta)$ Representation as a Convolution Integral}
+\label{app:TnConvolutionDeriv}
+%%%%%%%%%%%%%%%%%%%%%Foils %%%%%%%%%%%%%%%%
+% \section{}
+				\begin{equation}
+					\mathcal{T}_n(\beta)=\frac{1}{2\pi}\frac{1}{\lambda_s^n}\int_{-\infty}^{\infty}\mathrm{e}^{i\beta\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta')\mathrm{e}^{-\beta'/2}\mathrm{e}^{-i\beta'\hat{t}}~d\beta'\right]^n~d\hat{t}.
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\frac{1}{2\pi}\frac{1}{\lambda_s^n}\int_{-\infty}^{\infty}\mathrm{e}^{-i\beta\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta')\mathrm{e}^{\beta'/2}\mathrm{e}^{-i\beta'\hat{t}}~d\beta^{\prime}\right]\left[\int_{-\infty}^{\infty}P(\beta'')\mathrm{e}^{-\beta''/2}\mathrm{e}^{-i\beta''\hat{t}}~d\beta''\right]^{n-1}~d\hat{t}
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\frac{1}{2\pi}\frac{1}{\lambda_s^n}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\mathrm{e}^{-i\beta\hat{t}}P(\beta')\mathrm{e}^{\beta'/2}\mathrm{e}^{-i\beta'\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta'')\mathrm{e}^{-\beta''/2}\mathrm{e}^{-i\beta''\hat{t}}~d\beta''\right]^{n-1}~d\beta^{\prime}~d\hat{t}
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\frac{1}{2\pi}\frac{1}{\lambda_s^n}\int_{-\infty}^{\infty}\mathrm{e}^{-i\beta\hat{t}}P(\beta')\mathrm{e}^{\beta'/2}\int_{-\infty}^{\infty}\mathrm{e}^{-i\beta'\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta'')\mathrm{e}^{-\beta''/2}\mathrm{e}^{-i\beta''\hat{t}}~d\beta''\right]^{n-1}~d\hat{t}~d\beta^{\prime}
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\frac{1}{2\pi}\frac{1}{\lambda_s^n}\int_{-\infty}^{\infty}P(\beta')\mathrm{e}^{\beta'/2}\left[\int_{-\infty}^{\infty}\mathrm{e}^{i(\beta-\beta')\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta'')\mathrm{e}^{-\beta''/2}\mathrm{e}^{-i\beta''\hat{t}}~d\beta''\right]^{n-1}~d\hat{t}\right]d\beta^{\prime}
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\int_{-\infty}^{\infty}\frac{P(\beta')\mathrm{e}^{\beta'/2}}{\lambda_s}\left[\frac{1}{2\pi\lambda_s^{n-1}}\int_{-\infty}^{\infty}\mathrm{e}^{i(\beta-\beta')\hat{t}}\left[\int_{-\infty}^{\infty}P(\beta'')\mathrm{e}^{-\beta''/2}\mathrm{e}^{-i\beta''\hat{t}}~d\beta''\right]^{n-1}~d\hat{t}\right]d\beta^{\prime}
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\int_{-\infty}^{\infty}\frac{P(\beta')\mathrm{e}^{\beta'/2}}{\lambda_s}\mathcal{T}_{n-1}\left(\beta-\beta^{\prime}\right)d\beta^{\prime}
+				\end{equation}
+
+				\begin{equation}
+					\mathcal{T}_{n}(\beta)=\int_{-\infty}^{\infty}\mathcal{T}_{1}\left(\beta^{\prime}\right)\mathcal{T}_{n-1}\left(\beta-\beta^{\prime}\right)d\beta^{\prime}\label{ap:eq:finalTn}
+				\end{equation}
+
+
+\end{document}

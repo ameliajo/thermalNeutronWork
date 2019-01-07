@@ -1,0 +1,216 @@
+%whaddup bitches congrats on getting that sweet ass thesis finished yo
+%
+%
+%document header; you don't need to mess with this, unless you know what you're doing
+\documentclass{article}
+%\usepackage[letterpaper, margin=1in]{geometry}
+%\usepackage{textcomp} %added to make the copyright symbol look a little prettier; comment out to see the difference!
+%
+%
+%%%%%%%%%%%%%%%%%%%%Important reads for Latex Theses%%%%%%%%%%%%%%%%%%%%
+%
+%
+%<https://www.sharelatex.com/blog/2013/08/02/thesis-series-pt1.html>
+%<https://www.sharelatex.com/learn/Multi-file_LaTeX_projects>
+%
+%
+%Personal formatting. For use with subfiles and the sharelatex recommended structure.
+%\documentclass[../master.tex]{subfiles}
+%\graphicspath{ {../images/} }
+%
+%  _                 _      _    _               
+% | |               | |    | |  | |              
+% | |     ___   ___ | | __ | |__| | ___ _ __ ___ 
+% | |    / _ \ / _ \| |/ / |  __  |/ _ \ '__/ _ \
+% | |___| (_) | (_) |   <  | |  | |  __/ | |  __/
+% |______\___/ \___/|_|\_\ |_|  |_|\___|_|  \___|
+%                                               
+%
+%These are links to pages that show you what your title and abstract pages should look like
+%Also a link to the NSE Faculty page in the MIT Catalog, which contains Prof's full titles --> use them!
+%Links current as of Nov. 20, 2017
+%<https://libraries.mit.edu/archives/thesis-specs/#title>
+%<https://libraries.mit.edu/archives/thesis-specs/#abstract>
+%<http://catalog.mit.edu/schools/engineering/nuclear-science-engineering/#facultystafftext>
+%
+%
+%%%%%%%%%%%%%%%%%%%%Important reads for Latex Theses%%%%%%%%%%%%%%%%%%%%
+%
+%
+%These are the document variables this is all you need to edit to update this
+%
+%the thesis title. Replace the text in the second set of {}
+\newcommand{\thesis}{Efficient and Accurate Sampling of the Thermal Neutron Scattering Law in OpenMC}
+%
+%Not me; you! The thesis author
+\newcommand{\me}{Amelia J. Trainer}
+%
+%when you get your diploma yo
+\newcommand{\gradMonth}{JUNE}%only JUNE, SEPTEMBER, or FEBRUARY
+\newcommand{\gradYear}{2019}
+%
+%When you actually sign this and turn it in to people
+\newcommand{\signDate}{May 18, 2019}
+%
+%Your thesis advisor's name and title. See above links for help finding your prof's title.
+\newcommand{\advisorName}{Benoit Forget}
+\newcommand{\advisorTitle}{Associate Professor of Nuclear Science and Engineering}
+\newcommand{\readerName}{Kord Smith}
+\newcommand{\readerTitle}{Korea Electric Power Company (KEPCO) Professor of the Practice of Nuclear Science and Engineering}
+%
+%
+%The Undegraduate committee chair to whom you submit this (most likely Prof. Short). 
+%double check on his title. This title was accurate in 2017.
+\newcommand{\ugChairName}{Michael Short}
+\newcommand{\ugChairTitle}{Assistant Professor of Nuclear Science and Engineering}
+\newcommand{\ugChairChair}{Chairman, NSE Committee for Undergraduate Students}
+%
+%The text of your abstract. 
+%
+%
+%%%%%%%%%%%%%%%%%Import copyright information%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+% Either you or MIT owns the copyright. If in doubt ask the Technology Licensing Office
+%This might help: <https://libraries.mit.edu/archives/thesis-specs/#copyright>
+%
+%If you had a UROP has part of your thesis MIT most likely owns the copyright on your thesis
+%
+%If you own the copyright Uncommnet this part
+%%
+%\newcommand{\copyStatement}{{\textcopyright \ \gradYear\ \ \me. All rights reserved.}\vfill     \parbox{3.7in}{\centering The author hereby grants to MIT permission to reproduce and to distribute publicly paper and electronic copies of this thesis document in whole or in part in any medium now known or hereafter created.}}
+    
+    
+%If MIT owns the copyright uncomment this part
+%
+\newcommand{\copyStatement}{{\textcopyright \ \gradYear \ Massachusetts Institute of Technology. All rights reserved.}}
+
+\newcommand{\abstractart}{   
+    THIS IS MY ABSTRACT LOCATED IN TITLEPAGE.TEX
+    }
+%
+%
+%
+%
+%
+% __     __                                 _                _             _    _             
+% \ \   / /                                | |              | |           | |  (_)            
+%  \ \_/ /__  _   _    ___ __ _ _ __    ___| |_ ___  _ __   | | ___   ___ | | ___ _ __   __ _ 
+%   \   / _ \| | | |  / __/ _` | '_ \  / __| __/ _ \| '_ \  | |/ _ \ / _ \| |/ / | '_ \ / _` |
+%    | | (_) | |_| | | (_| (_| | | | | \__ \ || (_) | |_) | | | (_) | (_) |   <| | | | | (_| |
+%    |_|\___/ \__,_|  \___\__,_|_| |_| |___/\__\___/| .__/  |_|\___/ \___/|_|\_\_|_| |_|\__, |
+%                                                   | |                                  __/ |
+%                                                   |_|                                 |___/ 
+%
+%
+%Now all the actual stuff. You probably don't need to mess with this too much.
+
+
+%
+% 
+\begin{document}
+\setcounter{page}{1} %forces page numbers to start on page 1
+%\pagestyle{empty}
+\begin{titlepage}
+    \begin{center}
+    {\Large{\thesis}}
+    \vfill
+    {by}
+    \vfill
+    {\me}
+    \vfill
+    {SUBMITTED TO THE DEPARTMENT OF NUCLEAR SCIENCE AND ENGINEERING IN PARTIAL FULFILLMENT OF THE REQUIREMENTS FOR THE DEGREE OF}
+    \vfill
+    {MASTER OF SCIENCE IN NUCLEAR SCIENCE AND ENGINEERING}
+    \vfill
+    {AT THE}
+    \vfill
+    {MASSACHUSETTS INSTITUTE OF TECHNOLOGY}
+    \vfill
+    {\gradMonth\ \gradYear}
+    \vfill
+	\copyStatement
+    \end{center}
+    
+    \vspace*{\stretch{8}}
+    
+    \begin{flushleft}
+    {Signature of Author:\hrulefill}
+    \end{flushleft}
+    
+    \begin{flushright}
+    {\me }
+    
+    {Department of Nuclear Science and Engineering}
+    
+    {\signDate }
+    \end{flushright}
+    \vfill
+
+    \begin{flushleft}
+    {Certified by:\hrulefill}
+    \end{flushleft}
+    
+    \begin{flushright}
+    {\advisorName}
+    
+    {\advisorTitle}
+    
+    {Thesis Supervisor}
+    
+    \end{flushright}
+    \vfill
+
+\begin{flushleft}
+    {Accepted by:\hrulefill}
+    \end{flushleft}
+    
+    \begin{flushright}
+	{\ugChairName}
+	
+	{\ugChairTitle}
+	
+	{\ugChairChair}
+    \end{flushright}
+    
+\end{titlepage}
+\blankpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Abstract page%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{titlepage}
+\setcounter{page}{3} 
+    \begin{center}
+    {\large{\thesis}}
+    
+    \bigskip
+    {by}
+    
+    \bigskip
+    {\me}
+    
+    \bigskip
+    {\parbox{3.7in}{\centering Submitted to the Department of Nuclear Science and Engineering on {\signDate}\ in Partial Fulfillment of the Requirements for the Degree of Master of Science in Nuclear Science and Engineering}}
+    \end{center}
+    \bigskip
+    
+    \begin{flushleft}
+    ABSTRACT
+    
+    \bigskip
+    \abstractart
+    \vfill
+    {Thesis Supervisor: \advisorName}
+    
+    {Title: \advisorTitle}
+
+    ~\\~\\
+    
+    {Thesis Reader: \readerName}
+    
+    {Title: \readerTitle}
+    \end{flushleft}
+    
+\end{titlepage}
+\blankpage
+\end{document}
+%\end{MIT}

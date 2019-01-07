@@ -1,0 +1,87 @@
+%whaddup bitches congrats on getting that sweet ass thesis finished yo
+
+\documentclass[12pt,twoside]{report}
+
+%Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[letterpaper,margin=1in,bindingoffset=6mm]{geometry}
+\usepackage{graphicx}
+\usepackage{textcomp} %included to make the copyright symbol look a little prettier
+\usepackage{siunitx} %only included since my abstract uses this package
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{relsize}
+\usepackage{mathtools}
+\usepackage{subfiles}
+\usepackage{array}
+\usepackage[toc,page]{appendix} %makes pretty appendices
+\usepackage{csvsimple}
+\usepackage{textcomp}  %makes pretty copyright symbol
+\usepackage{longtable}  %allows multi-page tables
+\usepackage{afterpage}
+\usepackage{listings}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+
+%\usepackage{minitoc} %makes mini table of contents
+%\usepackage[nottoc,numbib]{tocbibind} %adds bib to TOC
+\usepackage[nottoc]{tocbibind}
+
+%don't mess with package order below  here
+\usepackage{hyperref}
+\usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+     citecolor=blue
+}
+ 
+\urlstyle{same}
+
+%Settings
+\graphicspath{ {images/} }
+\addbibresource{references.bib}
+
+\newcommand\blankpage{
+    \null
+    \thispagestyle{empty}
+    %\addtocounter{page}{-1}
+    \newpage}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%Title and TOC%%%%%%%%%%%%%%%%%%
+\subfile{titlePage}
+%\subfile{abstract}
+%\doublespacing           %TODO Remove proof reading section
+\subfile{Acknowledgement}
+
+\tableofcontents
+\listoffigures
+ 
+\listoftables
+%%%%%%%%%%%%%Introduction%%%%%%%%%%%%%%%%
+
+\subfile{Introduction}
+
+\subfile{delta}
+
+\subfile{cdf}
+
+\medskip
+
+\printbibliography
+
+
+
+%%%%%%%%%%%%%%%%%%%%%Appendices %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{appendices}
+\subfile{TnconvolutionDeriv}
+\end{appendices}
+
+\end{document}
+
+%\end{MIT}

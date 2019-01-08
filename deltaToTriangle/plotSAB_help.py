@@ -21,9 +21,9 @@ def plotBetaForVariousAlpha(alphaVals,betaVals,sab,A0,E,kbT,scalarMap,style,addL
                 validBeta.append(beta)
                 validSab.append(a_i_b_all[b])
         if addLabel:
-            plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a),marker=style)
+            plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a),marker=style,linewidth=1)
         else:
-            plt.plot(validBeta,validSab,color=scalarMap.to_rgba(a),marker=style,linestyle='--')
+            plt.plot(validBeta,validSab,color=scalarMap.to_rgba(a),marker=style,linestyle='--',linewidth=1)
 
 
     #plt.legend(loc='best')

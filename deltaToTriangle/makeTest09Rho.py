@@ -15,6 +15,7 @@ for i in range(200):
 
 
 
+
 continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
   .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
@@ -78,21 +79,29 @@ if __name__=="__main__":
     import sys 
     if len(sys.argv) > 1:
         plt.plot(E,getPhononDist(0,continRho),'r')
-        if sys.argv[1] == 'delta' or sys.argv[1] == 'triangles':
-            plt.plot([0.205,0.205],[0.0,70.0],'r')
-            plt.plot([0.48,0.48],[0.0,140.0],'r')
+        if sys.argv[1] == 'delta':
+            plt.plot([0.205,0.205],[0.0,25*0.166667],'r')
+            plt.plot([0.48,0.48],[0.0,25*0.333333],'r')
+            plt.title('Phonon distribution used in NJOY 2016 Test \#9')
 
-        if sys.argv[1] == 'altered':
-            plt.plot([0.204,0.204],[0.0,70.0],'r')
-            plt.plot([0.4794,0.4794],[0.0,140.0],'r')
 
-        if sys.argv[1] == 'altered' or sys.argv[1] == 'triangles':
+        if sys.argv[1] == 'triangles':
+            plt.plot([0.205,0.205],[0.0,130],'r')
+            plt.plot([0.48,0.48],[0.0,130],'r')
             for i in range(2,12,2):
                 plt.plot(E,getPhononDist(i,continRho))
+            plt.title('Phonon distribution for H in H2O,\nwith oscillators approximated as triangles')
+
+
+        if sys.argv[1] == 'altered':
+            plt.plot([0.204,0.204],[0.0,130],'r')
+            plt.plot([0.4794,0.4794],[0.0,130],'r')
+            for i in range(2,12,2):
+                plt.plot(E,getPhononDist(i,continRho))
+            plt.title('Phonon distribution for H in H2O, with oscillators approximated\nas triangles and slightly shifted to match grid')
 
         plt.xlabel('Energy (eV)')
         plt.ylabel('Freq. Distribution')
-        plt.title('Phonon Distribution for H in H2O (delta functions of arbitrary height)\n as prepared for NJOY 2016 Test09')
 
         plt.show()
 

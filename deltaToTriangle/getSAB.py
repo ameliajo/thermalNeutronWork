@@ -115,9 +115,19 @@ if __name__=="__main__":
 
     ax = plt.gca()
     plt.colorbar(colorBar).ax.set_ylabel('alpha values')
-    plt.title('S(a,b) values for water, generated using my leapr vs. NJOY leapr')
+    plt.title('S(a,b) values for water, generated using\ntranslated (C++) vs. legacy (Fortran) LEAPR')
     ax.set_facecolor('xkcd:off white')
     ax.set_facecolor('xkcd:light grey blue')
+    plt.yscale('log')
+    ax.text(10.8, 1e-2, r'--- Translated', fontsize=12)
+    ax.text(10.8, 5e-3, r'__ ', fontsize=12)
+    ax.text(10.8, 4e-3, r'    Legacy', fontsize=12)
+    #ax.text(8.15, 1e-2, r'--- Translated', fontsize=12)
+    #ax.text(8.15, 5e-3, r'__ ', fontsize=12)
+    #ax.text(8.15, 4e-3, r'    Legacy', fontsize=12)
+
+
+
     plt.show()
 
     ###########################################################################
@@ -126,7 +136,7 @@ if __name__=="__main__":
 
     ax = plt.gca()
     plt.colorbar(colorBar).ax.set_ylabel('alpha values')
-    plt.title('S(a,b) error for water, generated using my leapr vs. NJOY leapr')
+    plt.title('S(a,b) error for water, generated using\ntranslated (C++) vs. legacy (Fortran) LEAPR')
     ax.set_facecolor('xkcd:off white')
     ax.set_facecolor('xkcd:light grey blue')
     plt.show()

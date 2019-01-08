@@ -78,7 +78,7 @@
 			\end{equation}
 			into a sum of discrete oscillators (represented by weighted delta-functions $\omega_j\delta(\beta_j)$), a solid-type spectrum $\rho_s(\beta)$, and a translational spectrum $\rho_t(\beta)$. The solid-type spectrum and translational spectrum integrate to $\omega_s$ and $\omega_t$, respectively, such that 
 			\begin{equation}
-				\sum_{j=1}^{\#~\mbox{osc.}}\omega_j + \omega_s + \omega_t = 1.
+                          \sum_{j=1}^{\#~\mbox{osc.}}\omega_j + \omega_s + \omega_t = 1.\label{eq:weightsSumTo1}
 			\end{equation}
 			LEAPR uses each component of this decomposed frequency distribution to create a corresponding scattering law $S_{sym,i}(\alpha,\beta,T)$, then convolves these individual scattering laws to retreive the true scattering relation $S_{n.sym}(\alpha,\beta,T)$.
 
@@ -142,7 +142,7 @@
                                 \begin{equation}
                                         \lambda_{i}=w_{i}\frac{\operatorname{coth}\left(\beta_{i}/2\right)}{\beta_{i}}
                                 \end{equation}
-                                and $\mathrm{I}_n(x)$ is the Modified Bessel function of the first kind. When combining a continuous, solid-type spectrum with discrete oscillators, the total Debye-Waller coefficient is simply the sum,
+                                and $\mathrm{I}_n(x)$ is the modified Bessel function of the first kind. When combining a continuous, solid-type spectrum with discrete oscillators, the total Debye-Waller coefficient is simply the sum,
                                 \begin{equation}
                                         \lambda=\lambda_{s}+\sum_{i=1}^{N}\lambda_{i}
                                 \end{equation}
@@ -175,30 +175,36 @@
 
 			
 			\subsubsection{Translational Spectra}
-
-                            \begin{align}
-                                \mathcal{S}_{t}(\alpha,\beta)=&\frac{2cw_{t}\alpha}{\pi}\exp\left[2c^{2}w_{t}\alpha-\beta/2\right]\\
-                                &\frac{\sqrt{c^{2}+.25}}{\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}}K_{1}\left\{\sqrt{c^{2}+.25}\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}\right\}
-                            \end{align}
-
-                            
+                           Thermal neutron scattering off of some materials, especially gasses and liquids, can be modeled by considering a solid-type, continuous spectrum, combined with a diffusive term. For liquid moderators, LEAPR makes use of the ``effective width model''~\cite{egelstaff}. The effective width model defines the translational contribution to the scattering law as  
+                            %\begin{equation}
+                            %  S^{(t)}_{n.sym}(\alpha,\beta)=\frac{2cw_{t}\alpha}{\pi}\mathrm{e}^{\left[2c^{2}w_{t}\alpha-\beta/2\right]}\frac{\sqrt{c^{2}+.25}}{\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}}K_{1}\left\{\sqrt{c^{2}+.25}\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}\right\}
+                            %\end{equation}
                             \begin{equation}
-                              \rho(\beta)=w_{t}\frac{4c}{\pi\beta}\sqrt{c^{2}+.25}\sinh(\beta/2)K_{1}\left\{\sqrt{c^{2}+.25}\beta\right\}
+                              S^{(t)}_{n.sym}(\alpha,\beta)=\mathrm{e}^{\left[2c^{2}w_{t}\alpha-\beta/2\right]}\frac{2cw_{t}\alpha\sqrt{c^{2}+.25}}{\pi\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}}\mathrm{K}_{1}\left\{\sqrt{c^{2}+.25}\sqrt{\beta^{2}+4c^{2}w_{t}^{2}\alpha^{2}}\right\}
                             \end{equation}
-
-
+                            with the phonon distribution is defined as
                             \begin{equation}
-                              \mathcal{S}_{t}(\alpha,-\beta)=\frac{1}{\sqrt{4\pi w_{t}\alpha}}\exp\left[-\frac{\left(w_{t}\alpha-\beta\right)^{2}}{4w_{t}\alpha}\right]
+                              \rho(\beta)=w_{t}\frac{4c}{\pi\beta}\sqrt{c^{2}+.25}\sinh(\beta/2)\mathrm{K}_{1}\left\{\sqrt{c^{2}+.25}\beta\right\}
                             \end{equation}
-
+                            where $w_t$ is the translational weight, $c$ is the diffusion constant, and $\mathrm{K}_1$ is the modified Bessel function of the second kind.\par
+                            For gas moderators, and even some liquid moderators, the free gas approximation can be used as an alternative to the effective width model,
                             \begin{equation}
-                              \mathcal{S}_{t}(\alpha,\beta)=\mathrm{e}^{-\beta}\mathcal{S}_{t}(\alpha,-\beta)
+                              S^{(t)}_{n.sym}(\alpha,\beta)=e^{-\beta}\frac{1}{\sqrt{4\pi w_{t}\alpha}}\exp\left[-\frac{\left(w_{t}\alpha-\beta\right)^{2}}{4w_{t}\alpha}\right].
                             \end{equation}
+                            Once the translational contribution to the scattering law is calculated, it is convolved with the other contributions to obtain the total $S_{n.sym}(\alpha,\beta)$.
+
+                            %\begin{equation}
+                            %  S^{(t)}_{n.sym}(\alpha,-\beta)=\frac{1}{\sqrt{4\pi w_{t}\alpha}}\exp\left[-\frac{\left(w_{t}\alpha-\beta\right)^{2}}{4w_{t}\alpha}\right]
+                            %\end{equation}
+
+                            %\begin{equation}
+                            %  S^{(t)}_{n.sym}(\alpha,\beta)=\mathrm{e}^{-\beta}\mathcal{S}_{t}(\alpha,-\beta)
+                            %\end{equation}
 
 
-                            \begin{equation}
-                              \mathcal{S}(\alpha,\beta)=\mathcal{S}_{t}(\alpha,\beta)\mathrm{e}^{-\alpha\lambda_{s}}+\int_{-\infty}^{\infty}\mathcal{S}_{t}\left(\alpha,\beta^{\prime}\right)\mathcal{S}_{s}\left(\alpha,\beta-\beta^{\prime}\right)d\beta^{\prime}
-                            \end{equation}
+                            %\begin{equation}
+                            %  S^{(s,1,2,..,t)}_{n.sym}(\alpha,\beta)=\mathcal{S}_{t}(\alpha,\beta)\mathrm{e}^{-\alpha\lambda_{s}}+\int_{-\infty}^{\infty}\mathcal{S}_{t}\left(\alpha,\beta^{\prime}\right)S^{(s,1,2,..)}_{n.sym}\left(\alpha,\beta-\beta^{\prime}\right)d\beta^{\prime}
+                            %\end{equation}
 
 
 

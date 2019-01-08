@@ -1,23 +1,193 @@
-\documentclass[../master.tex]{subfiles}
+\documentclass[Master.tex]{subfiles}
 
-\graphicspath{{../images/}}
+\graphicspath{{images/}}
 \begin{document}
 %\doublespace
 \chapter{Accurate Representation of Phonon Distributions}
 
-	\section{Discrete Oscillator Approximation for Phonon Spectra}
-		Tell me why this is fundamentally different than the contin treatment. Actually go and walk through what NJOY manual is saying.
+        \section{Discrete Oscillator Approximation}\label{sec:test9}
+            The LEAPR module of NJOY, which is used to prepare thermal scattering data in the form of the scattering law, $S(\alpha,\beta,T)$, often approximates peaks in the phonon spectra as discrete oscillators, and models them as weighted $\delta$-functions. In the event that a user would want to avoid this approximation, and instead apply the continuous phonon distribution treatment to those selected areas, it is crucial to verify agreement between these two methods. To test this, a simplified version of the NJOY 2016 release Test Problem 9 is considered~\cite{njoy}. The LEAPR component of Test Problem 9 models H in H$_2$O using a slightly simplified phonon spectrum, and moderately coarse $\alpha,\beta$ grids (65 and 75 values, respectively). Fig.~\ref{fig:waterPhonon} contains the phonon spectrum that NJOY 2016 uses in their Test Problem 9. 
+                        \begin{figure}[h]
+                          \begin{center}
+                          \includegraphics[scale=0.7]{waterPhononDist}
+                            \caption[Phonon Distribution for NJOY 2016 Test Problem 9]{The phonon distribution for NJOY 2016 Test Problem 9 is shown above. It contains a continuous contribution, shown on the lower energy region, and two $\delta$ functions to approximate the higher energy peaks. }
+                          \label{fig:waterPhonon}
+                          \end{center}
+                        \end{figure}
+
+              For Test Problem 9, the continuous region of phonon is defined as $\rho(\beta)=\rho(\Delta E/k_bT)$ for $\Delta E$ spanning from 0-0.16575 eV, where the energy grid is uniformly spaced in increments of 0.00255 eV. The translational contribution to Test Problem 9 is removed $(\omega_t=0)$, and thus the continuous weighting $(\omega_s)$ is increased from 0.444444 to 0.5.  The locations and weights of the two discrete oscillators are provided in Table~\ref{tab:test9_delta_facts}. Note that, as required by Eq.\ref{eq:weightsSumTo1}, 
+              \begin{equation}
+                \omega_s+\omega_1+\omega_2= 0.5 + 0.166667 + 0.333333 = 1.0.
+              \end{equation}
+              \begin{table}
+              	\centering
+                \caption[Energies and Weights for $\delta$ functions used in NJOY 2016 Test Problem 9]{Energies and Weights for $\delta$ functions used in NJOY 2016 Test Problem 9}
+              	\label{tab:test9_delta_facts}
+                       \begin{tabular}{ |c|c| }\hline
+                              Energy (eV)& Weighting\\\hline
+                              0.205& 0.166667\\\hline
+                              0.480 & 0.333333 \\\hline
+                       \end{tabular}\\[1ex]
+              \end{table}
+
+ 
 
 	\section{Representing Discrete Oscillators as Continuous Points in Freq. Dist.}
+                In order to allow users to avoid the $\delta$ function approximation that is commonly used in NJOY's LEAPR module, it is crucial to demonstrate similar behavior between how the solid-type, continuous treatment vs. discrete oscillator treatment processes sharp peaks. For this discussion, Test Problem 9, which was described in Sec.~\ref{sec:test9} is considered. To allow for more flexible analysis, LEAPR's source code was translated from Fortran to C++. So first, the results of the translated C++ LEAPR are compared against legacy Fortran LEAPR for the simple H in H$_2$O model, to establish valididty in the method. Then, the discrete oscillators in Test Problem 9 are replaced with triangles of varying thickness, to illustrate that as the thickness of the triangle decreases, it approaches the behavior characteristic of a $\delta$ function oscillator.
 		\subsection{Equivalence of Revised-LEAPR to Legacy-LEAPR}
-			As part of this project, I rewrote LEAPR in C++. Look at these plots, I did a good job.
+                   NJOY's LEAPR module was translated from Fortran to C++, so as to provide flexibility in later analysis. The C++ translation must of course replicate the original NJOY code adequately. To illustate this, Fig.~\ref{fig:me_vs_njoy_sab} contains $S(\alpha,\beta)$ as it was calculated using both the original LEAPR code, as well as the translated LEAPR code. Note that the for nearly all $\alpha,\beta$ values shown, the two datasets are virtually indistinguishable from each other.
+                       \begin{figure}[H]
+                           \begin{center}
+                              %\includegraphics[width=0.415\textwidth]{images/me-vs-njoy-1}
+                              %\includegraphics[width=0.485\textwidth]{images/me-vs-njoy-2}
+                              \includegraphics[width=0.8\textwidth]{images/me-vs-njoy-1-orig}
+                              %\includegraphics[width=0.52\textwidth]{images/me-vs-njoy-2}
+                             \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Comparison of $S(\alpha,\beta)$ results, comparing translated (C++) vs. legacy (Fortran) LEAPR for H in H$_2$O Test \#9 Input. The translated- and legacy-generated results are represented with dotted and solid lines, respectively.}
+                              \label{fig:me_vs_njoy_sab}
+                           \end{center}
+                      \end{figure}
+                      Fig.~\ref{fig:me_vs_njoy_error} shows the percent error between the $S(\alpha,\beta)$ values produced by the translated and original LEAPR, that were plotted in Fig.~\ref{fig:me_vs_njoy_sab}.  Notice that the percent error is significantly lower in the $\beta$ regions where $S(\alpha,\beta)$ is of reasonable size. 
 
-		\subsection{Representing Discrete Oscillator as a Thin Triangle in Freq. Dist.}
-			This is where I want to put how $S(\alpha,\beta)$ looks for $\delta$ vs. triangle of width 2, for many alpha, beta pairs.
+                      \begin{figure}[h]
+                          \begin{center}
+                             \includegraphics[width=0.8\textwidth]{images/me-vs-njoy-3}
+                             \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 (\% Error) ]{Comparison of translated vs. legacy LEAPR, for test \#9, with the percent error plotted. Note that in the $\beta$ region where percent error increases, is the same region in Fig.~\ref{fig:me_vs_njoy_sab} where the $S(\alpha,\beta)$ values become significantly smaller.}
+                             \label{fig:me_vs_njoy_error}
+                          \end{center}
+                      \end{figure}
+                      Thus, the translated version of LEAPR is considered an adequate tool for processing thermal data for the following discussion. However, conclusions drawn using the translated LEAPR will be verified alongside those drawn from the legacy LEAPR. Note that the translated LEAPR was also tested against legacy LEAPR with other cases considered.
+                      
+
+		\subsection{Replacing Discrete Oscillator $\delta$ Functions as Triangles}
+                  To verify that discrete oscillator treatment can be replicated by using increasingly thin triangles, each triangle must integrate to the weight of its corresponding $\delta$ function. Triangles of various widths (2,4,6,8, and 10 grid spaces) are used to replace both $\delta$ functions, and are plotted in Fig.~\ref{fig:waterPhononTriangle}.
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[width=0.8\textwidth]{waterPhononDistTriangles}
+                \caption[Phonon Distribution for H in H$_2$O, with oscillators replaced with phonon distribution triangles of various widths]{Phonon Distribution for H in H$_2$O, with oscillators replaced with phonon distribution triangles of various widths. The area under each triangle integrates to its corresponding $\delta$ function weight $\omega_i$, and the lower energy continuous component integrates to the solid-type weight $\omega_s$.}
+              \label{fig:waterPhononTriangle}
+              \end{center}
+            \end{figure}
+
+            NJOY requires any continuous phonon distribution to be provided with respect to a uniformly-spaced energy grid. Thus, in Fig.~\ref{fig:waterPhononTriangle}, the centers of the triangles are not necessarily equal to the exact location of the $\delta$ functions that are specified in Table.~\ref{tab:test9_delta_facts}. A closer view of Fig.~\ref{fig:waterPhononTriangle}, shown in Fig.~\ref{fig:waterPhononTriangleZoomed}, illustrates an offset between the triangle centers and the real oscillator location. Since the triangles' points are limited to increments of $\Delta E=0.00255$ eV, some inaccuracies are to be expected.
+
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[width=0.8\textwidth]{waterPhononDistTrianglesZoomed}
+                \caption{This is a zoomed in version of Fig.~\ref{fig:waterPhononTriangle}, where we focus in on the 0.204 eV $\delta$ function. The red line represents the $\delta$ function that is defined in the test \#9, while other colors represent triangles used to approximate the $\delta$ function.}
+              \label{fig:waterPhononTriangleZoomed}
+              \end{center}
+            \end{figure}
+            As a result of the discrepancy between discrete oscillator location and triangle center location, the oscillators energies are shifted slightly to align better with the $\Delta E=0.00255$ eV grid to which NJOY is restricted. The $\delta$ function parameters presented in Table.~\ref{tab:test9_delta_facts} are amended to those in Table.~\ref{tab:amended_delta_facts}
+
+
+
+              \begin{table}
+              	\centering
+                \caption[Energies and Weights for $\delta$ functions, Amended to Align with Continuous Energy Grid]{Energies and Weights for $\delta$ functions, Amended to Align with Continuous Energy Grid}
+              	\label{tab:amended_delta_facts}
+                       \begin{tabular}{ |c|c| }\hline
+                              Energy (eV)& Weighting\\\hline
+                               0.204& 0.166667\\\hline
+                               0.4794 & 0.333333 \\\hline
+                       \end{tabular}\\[1ex]
+              \end{table}
+
+
+
+  
+%  Note that since the triangle approximations are forced to stay on the predetermined phonon grid with spacing 0.00255, the triangles used do not exactly line up with the actual $\delta$ functions that are provided in the Test09 documentation (i.e. the red line in Fig.~\ref{fig:waterPhononTriangleZoomed} does not fall in the center of the triangles). Thus, for the purposes of this discussion, we'll artificially shift over the $\delta$ functions, so that they can line up with the 0.00255 eV grid. We will no longer consider the $\delta$ functions to be located at 0.205 and 0.48 eV, but rather 0.204 and 0.4794 eV, respectively. These values, which are used for the rest of this discussion, are provided in Table 2.
+
+
+            %\begin{figure}[h]
+            %  \begin{center}
+            %  \includegraphics[scale=0.5]{alteredDelta}
+            %  \includegraphics[scale=0.5]{alteredDeltaZoomed}
+            %    \caption{These figures can be generated by running ``makeTest09.py altered'' in the thermalNeutronWork/deltaToTriangle directory.}
+            %  \label{fig:alteredDelta}
+            %  \end{center}
+            %\end{figure}
+
+
+
+
+
+
+              \clearpage
+
 		\subsection{$S(\alpha,\beta)$ Response to Changes in Triangle Size} 
 			This is where I want to pick a few $\alpha$ values, and show how changing triangle size affects $S(\alpha,\beta)$
 
+                        \clearpage
 	\section{Nonuniform Phonon Distribution Energy Grid}
+
+
+\section*{Identifying the effect that changing $\delta$ functions to triangles has on $S(\alpha,\beta)$, for H in H$_2$O}
+
+  \subsection*{Problem Specification}
+  We approximate the delta functions to be triangles of various widths. This is shown in Fig.~\ref{fig:waterPhononTriangle}. The continuous description spans from 0 eV to 0.17 eV.
+
+
+ 
+
+\subsection*{Results: Thin Triangle vs. $\delta$ Func.}
+We use the phonon distributions generated earlier as input for NJOY, and generate resultant $S(\alpha,\beta)$ grids. We consider a phonon distribution with $\delta$ functions describing the higher energy region (with the energies and weights that are presented in Table 2), alongside a phonon distribution with thin triangles approximating the $\delta$ functions. The triangles used to approximate the $\delta$ functions have a total width of two spaces, or $2\times0.00255=0.0051$~eV.
+
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[scale=0.6]{sab_thinTriangle_and_delta_all_AB}
+                \caption{NJOY is used to generate the above plots, where we plot $S(\alpha,\beta)$ against $\beta$, for various $\alpha$ values. Note that since not all $\alpha$ values are compatible with all $\beta$ values, we have discrete line sort of behavior, especially for the low $\beta$ region. }
+              \label{fig:sabThinTriangleAllAB}
+              \end{center}
+            \end{figure}
+
+
+
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[scale=0.6]{sab_thinTriangle_and_delta_all_AB_Zoomed}
+                \caption{This is the same as Fig.~\ref{fig:sabThinTriangleAllAB}, except we zoom in on the peak near $\beta\approx8.05$. The dotted lines correspond to the values produced by NJOY using $\delta$ functions in the phonon distribution, while the solid lines correspond to those $\delta$ functions being approximated by a thin triangle.}
+              \label{fig:sabThinTriangleAllABZoomed}
+              \end{center}
+            \end{figure}
+
+
+            Let's look at Fig.~\ref{fig:sabThinTriangleAllABZoomed}, which is a zoomed-in version of Fig.~\ref{fig:sabThinTriangleAllAB}. It shows the $S(\alpha,\beta)$ values that were generated using NJOY for H in H$_2$O, wusing the $\delta$ function phonon distribution (dotted lines) and the triangle approximation to $\delta$ functions (solid lines). Note that $S(\alpha,\beta)$ grid that uses the triangle approximation for its higher energy peaks has more of a smear than the one that uses $\delta$ functions, which seems pretty reasonable.
+
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[scale=0.6]{sab_thinTriangle_error}
+                \caption{This is the absolute relative error between the $S(\alpha,\beta)$ produced using $\delta$ functions and $S(\alpha,\beta)$ produced using a thin (width = 2 spaces) triangle. Note that the error is very small away from the $\beta\approx8.05$ peak. }
+              \label{fig:sabThinTriangleError}
+              \end{center}
+            \end{figure}
+
+
+
+
+\subsection*{Results: Triangles of Various Widths vs. $\delta$ Func.}
+
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[scale=0.6]{diff_widths_alpha_0p5}
+                \caption{}
+              \label{fig:diff_widths_alpha_0p5}
+              \end{center}
+            \end{figure}
+
+              
+              We also look at the total error.
+              \[E_{total}=\sum_{\beta}\sum_\alpha \Big|S^\delta(\alpha,\beta)-S^\triangleleft(\alpha,\beta)\Big|\]
+
+            \begin{figure}[h]
+              \begin{center}
+              \includegraphics[scale=0.6]{diff_widths_total_error}
+                \caption{Note that as the width of the triangle decreases, the total accumulated error decreases significantly.}
+              \label{fig:diff_widths_total_error}
+              \end{center}
+            \end{figure}
+
+
+
 
 
 

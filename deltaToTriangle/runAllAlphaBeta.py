@@ -22,6 +22,7 @@ def finishPlotting(colorBar,title):
     plt.colorbar(colorBar).ax.set_ylabel('alpha values')
     plt.title(title)
     ax.set_facecolor('xkcd:light grey blue') # off white
+    plt.yscale('log')
     plt.show()
 
 
@@ -57,8 +58,8 @@ def runAlphasBetas(opt0,opt1,alphas,betas,continRho,oscE,oscW,fullRedo=False):
     finishPlotting(colorBar,'S(a,b) for H in H2O, generated with '+title)
     ########################################################################
     # Compare S(a,b) errors
-    plotErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
-    finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
+    #plotErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
+    #finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
     ########################################################################
 
 
@@ -67,8 +68,8 @@ def runAlphasBetas(opt0,opt1,alphas,betas,continRho,oscE,oscW,fullRedo=False):
 
 
 if __name__=="__main__":
-    alphas = [0.001, 0.01, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 2.0, 3.0, 4.0 ]
-    betas = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.6, 7.7, 7.8, 7.9, 8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 9, 10, 12, 14, 16,17, 18, 18.8, 18.9,19,19.1, 19.2, 20]
+    alphas = [0.001, 0.01, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 2.0, 3.0, 4.0, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    betas = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.6, 7.7, 7.8, 7.9, 8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 9, 10, 12, 14, 16,17, 18, 18.8, 18.9,18.95,19,19.1, 19.2, 20]
     continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
       .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
       .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
@@ -81,8 +82,8 @@ if __name__=="__main__":
     oscW = [ 0.166667, 0.333333 ]
 
     fullRedo = True
-    opt0,opt1 = ('mine',None),('mine',2) # Works
-    #opt0,opt1 = ('njoy',None),('njoy',2) # Works
+    #opt0,opt1 = ('mine',None),('mine',2) # Works
+    opt0,opt1 = ('njoy',None),('njoy',2) # Works
     #opt0,opt1 = ('mine',None),('njoy',None) # Works
     #opt0,opt1 = ('mine',2),('njoy',2) # Works
     #opt0,opt1 = ('mine',None),('njoy',2) # FAILS, diagonal comparison

@@ -7,7 +7,7 @@
 \chapter{Introduction}
 
 	\section{Motivation}\label{sec:motivation}
-		The merit of a nuclear system simulation is heavily dependent on the accuracy of the input nuclear data. Nuclear data (such as cross sections, particle emissions, etc.) is often complicated and highly energy dependent, which poses a challenge for those interested in effcieiently simulating the behavior of a nuclear system. Nuclear data is released in ``evaluations'', which are prepared by statistically combining experimentally measured data with theoretical predictions. The most widely used format for these evaluations is called the Evaluated Nuclear Data File (ENDF)~\cite{endfManual}. ENDF files are generally not directly used by nuclear simulations, but are rather preprocessed to account for simulation-specific conditions. In doing so, the ENDF is converted into a more usable form, called ``a compact ENDF'' (ACE)~\cite{ace}.\par
+		The merit of a nuclear system simulation is heavily dependent on the accuracy of the input nuclear data. Nuclear data (such as cross sections, particle emissions, etc.) is often complicated and highly energy dependent, which poses a challenge for those interested in efficiently simulating the behavior of a nuclear system. Nuclear data is released in ``evaluations'', which are prepared by statistically combining experimentally measured data with theoretical predictions. The most widely used format for these evaluations is called the Evaluated Nuclear Data File (ENDF)~\cite{endfManual}. ENDF files are generally not directly used by nuclear simulations, but are rather preprocessed to account for simulation-specific conditions. In doing so, the ENDF is converted into a more usable form, called ``a compact ENDF'' (ACE)~\cite{ace}.\par
 		
 		Currently, the most widely trusted code used for nuclear data preprocessing is NJOY, which has been developed and maintained at Los Alamos National Lab (LANL) since the early 1970's~\cite{njoy}. It has a large users base and is versatile for many nuclear data related tasks, including resonance reconstruction, Doppler-Broadening, multi-group cross section generation, and the preparation of thermal neutron scattering data. NJOY's capabilities are spread across 24 modules, each of which has a specified task. Two modules in particular, LEAPR and THERMR, handle the calculation and representation of thermal scattering from bound moderators. While the accuracy of thermal neutron scattering data can greatly dictate the quality of thermal reactor analysis and safety margin calculations, it remains a difficult problem, due to effects (molecular structure, neutron wavelength, described below) that are not apparent for higher neutron energies. \par
 
@@ -42,14 +42,24 @@
 			\begin{equation*}
 				\sigma\left(E\rightarrow E',\mu\right)=\frac{\sigma_{b}}{2kT}\sqrt{\frac{E'}{E}}S_{n.sym}(\alpha,\beta,T)\tag{\ref{eq:sabDefinition}}
 			\end{equation*}
-			which describes a neutron with incoming energy $E$ scattering with cosine $\mu$ into energy $E'$. Recall again that $\sigma_b$ is the characteristic bound scattering cross section for the target, $k_b$ is Boltzmann's constant, and $T$ is the temperature. Note that $S_{n.sym}(\alpha,\beta,T)$ is the non-symmetric form of the scattering law, which will be further discussed in !!!!!!!!!!!!!!!!!!!. Dimensionless momentum and energy transfer, $\alpha$ and $\beta$ respectively, are defined as 
+			which describes a neutron with incoming energy $E$ scattering with cosine $\mu$ into energy $E'$. Recall again that $\sigma_b$ is the characteristic bound scattering cross section for the target, $k_b$ is Boltzmann's constant, and $T$ is the temperature. Note that $S_{n.sym}(\alpha,\beta,T)$ is the non-symmetric form of the scattering law, which is related to the symmetric form by 
+                        \begin{equation}
+                          S_{sym}(\alpha,\beta,T)=\mathrm{e}^{\beta/2}S_{n.sym}(\alpha,\beta,T).
+                        \end{equation}
+                        Dimensionless momentum and energy transfer, $\alpha$ and $\beta$ respectively, are defined as 
 			\begin{equation}
 				\alpha=\frac{E'+E-2\mu\sqrt{E'E}}{AkT}
 			\end{equation}
 			\begin{equation}
 				\beta=\frac{E'-E}{kT}
 			\end{equation}
-			The symmetric scattering law $S_{n.sym}(\alpha,\beta)$ can be written as an integral across time in units of $\hbar/k_bT$ seconds, [THIS USES THE GAUSSIAN APPROXIMATION SO CHECK OUT Scattering of Slow Neutrons by a Liquid George H. Vineyard]
+			The symmetric scattering law $S_{n.sym}(\alpha,\beta)$ can be written as an integral across time in units of $\hbar/k_bT$ seconds, %[THIS USES THE GAUSSIAN APPROXIMATION SO CHECK OUT Scattering of Slow Neutrons by a Liquid George H. Vineyard]
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			\begin{equation}
 				S_{n.sym}(\alpha,\beta,T)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\mathrm{e}^{i\beta\hat{t}}\mathrm{e}^{-\gamma(\hat{t})}~d\hat{t}\label{eq:sabIntegralWithGamma}
 			\end{equation}
@@ -72,7 +82,7 @@
 			\begin{equation}
 				\int_{0}^{\infty}\rho(\beta)d\beta=1.
 			\end{equation}
-			Note that to get to this point, the only assumption made is that equating the form of incoherent inelastic scattering with that of coherent elastic scattering (incoheren approximation). At this point, LEAPR decomposes the frequency spectrum $\rho(\beta)$,
+			Note that to get to this point, the only assumption made is that equating the form of incoherent inelastic scattering with that of coherent elastic scattering (incoherent approximation). At this point, LEAPR decomposes the frequency spectrum $\rho(\beta)$,
 			\begin{equation}
 				\rho(\beta)=\sum_{j=1}^{\#~\mbox{osc.}}\omega_j\delta(\beta_j)+\rho_s(\beta)+\rho_t(\beta))
 			\end{equation}
@@ -80,10 +90,10 @@
 			\begin{equation}
                           \sum_{j=1}^{\#~\mbox{osc.}}\omega_j + \omega_s + \omega_t = 1.\label{eq:weightsSumTo1}
 			\end{equation}
-			LEAPR uses each component of this decomposed frequency distribution to create a corresponding scattering law $S_{sym,i}(\alpha,\beta,T)$, then convolves these individual scattering laws to retreive the true scattering relation $S_{n.sym}(\alpha,\beta,T)$.
+			LEAPR uses each component of this decomposed frequency distribution to create a corresponding scattering law $S_{sym,i}(\alpha,\beta,T)$, then convolves these individual scattering laws to retrieve the true scattering relation $S_{n.sym}(\alpha,\beta,T)$.
 
 			\subsubsection{Solid-Type Continuous Spectra}
-                                The solid-type continuous conribution to $S_{n.sym}(\alpha,\beta,T)$, denoted with an $(s)$ superscript, can be calculated by representing Eq.~\ref{eq:sabIntegralWithGamma} as a sum, and using a finite number of terms of that sum to approximate a contribution value. The solid-type continuous spectra depends on the frequency distributino $\rho(\beta)$.
+                                The solid-type continuous contribution to $S_{n.sym}(\alpha,\beta,T)$, denoted with an $(s)$ superscript, can be calculated by representing Eq.~\ref{eq:sabIntegralWithGamma} as a sum, and using a finite number of terms of that sum to approximate a contribution value. The solid-type continuous spectra depends on the frequency distribution $\rho(\beta)$.
 				Eq.~\ref{eq:gamma} can be rewritten as 
 				\begin{equation} 
 					\gamma(\hat{t})=\alpha\lambda_s-\alpha\int_{-\infty}^{\infty}P(\beta)\mathrm{e}^{-\beta/2}\mathrm{e}^{-i\beta\hat{t}}~d\beta.\label{eq:improvedGamma}
@@ -146,7 +156,7 @@
                                 \begin{equation}
                                         \lambda=\lambda_{s}+\sum_{i=1}^{N}\lambda_{i}
                                 \end{equation}
-                                where there are $N$ oscilllators considered. Combining all the factors in Eq.~\ref{eq:longDeltaFunctionSAB} without a $\beta$ term leaves us with
+                                where there are $N$ oscillators considered. Combining all the factors in Eq.~\ref{eq:longDeltaFunctionSAB} without a $\beta$ term leaves us with
 				\begin{equation}
                                   S^{(i)}_{n.sym}(\alpha,\beta)=\sum_{n=-\infty}^{\infty}A_{i,n}(\alpha)\delta\left(\beta-n\beta_{i}\right)\label{eq:shortDeltaFunctionSAB}
 				\end{equation}
@@ -154,7 +164,7 @@
                                 \begin{equation}
                                   A_{i,n}(\alpha)=\mathrm{e}^{-\alpha\lambda_i}\mathrm{I}_n\left[\frac{\alpha\omega_i}{\beta_i\sinh(\beta_i/2)}\right]e^{-n\beta_i/2}.
                                 \end{equation}
-                                Using Eq.~\ref{eq:longDeltaFunctionSAB} or Eq.~\ref{eq:shortDeltaFunctionSAB}, the contribution that an individual oscillator has to the total scattering law is rather simple to compute. Once computed, it must be convoled with the existing scattering law. Consider an example where two discrete oscillators contributions, $S^{(1)}_{n.sym}$ and $S^{(2)}_{n.sym}$, are being combined to a scattering law contribution from solid type spectrum $S^{(s)}_{n.sym}$.
+                                Using Eq.~\ref{eq:longDeltaFunctionSAB} or Eq.~\ref{eq:shortDeltaFunctionSAB}, the contribution that an individual oscillator has to the total scattering law is rather simple to compute. Once computed, it must be convolved with the existing scattering law. Consider an example where two discrete oscillators contributions, $S^{(1)}_{n.sym}$ and $S^{(2)}_{n.sym}$, are being combined to a scattering law contribution from solid type spectrum $S^{(s)}_{n.sym}$.
 
                                 \begin{align}
                                   S^{(s,1)}_{n.sym}(\alpha,\beta)=&\int_{-\infty}^{\infty}S^{(1)}_{n.sym}\left(\alpha,\beta'\right)S^{(s)}_{n.sym}\left(\alpha,\beta-\beta'\right)d\beta'\\

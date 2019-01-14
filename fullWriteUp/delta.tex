@@ -105,11 +105,11 @@
     \end{table}
     By slightly shifting the locations of the oscillators so that they are aligned with the triangles' grids, Fig.~\ref{fig:waterPhononTriangle} becomes Fig.~\ref{fig:waterPhononTriangleZoomedShifted}. The oscillator energies detailed in Table~\ref{tab:amended_delta_facts} are the problem specifications used for the remainder of this discussion. 
 
-    \begin{figure}[h]
+    \begin{figure}[H]
       \begin{center}
         \includegraphics[width=0.49\textwidth]{alteredDeltaZoomedb}
         %\includegraphics[scale=0.5]{alteredDelta}
-        \caption[Triangles of various widths, plotted alongside shifted $\delta$ functions]{Fig.~\ref{fig:waterPhononTriangle} illustrates an offset between the triangle centers and the $\delta$ function location, due to restrictions in the $\rho(E)$ grid. Thus, $\delta$ function locations were shifted to the energies detailed in Table~\ref{tab:amended_delta_facts}.}
+        \caption[Triangles of various widths, plotted alongside shifted $\delta$ functions]{Phonon distribution for H in H$_2$O, with triangles approximating the oscillators. The oscillator locations are shifted to the locations listed in Table~\ref{tab:amended_delta_facts}, so as to account for the offset due to restrictions in the $\rho(E)$ grid.}
         \label{fig:waterPhononTriangleZoomedShifted}
       \end{center}
     \end{figure}
@@ -124,35 +124,29 @@
     \begin{figure}[h]
       \begin{center}
         \includegraphics[width=0.85\textwidth]{images/me-vs-njoy-1c}
-        \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Comparison of Translated vs. Legacy LEAPR, using a simple H in H$_2$O model. Translated and legacy LEAPR are represented using dotted and dashed lines, respectively. Note the sharp peaks that characterize the $S(\alpha,\beta)$ spectrum, which correspond to the summation values in Eq.~\ref{eq:finalDelta}.}
+        \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Comparison of Translated vs. Legacy LEAPR, using a simple H in H$_2$O model. Translated and legacy LEAPR are represented using dotted and dashed lines, respectively. Note the sharp peaks that characterize the $S(\alpha,\beta)$ spectrum, which correspond to the summation values in Eq.~\ref{eq:finalDelta}, and are identified in Table~\ref{tab:spikeLocations}.}
         \label{fig:me_vs_njoy_sab}
       \end{center}
     \end{figure}
 
-    Fig.~\ref{fig:me_vs_njoy_error} shows the percent error between the $S(\alpha,\beta)$ values produced by the translated and original LEAPR, that were plotted in Fig.~\ref{fig:me_vs_njoy_sab}.  Notice that the percent error is significantly lower in the $\beta$ regions where $S(\alpha,\beta)$ is of reasonable size. 
-
-
+    Fig.~\ref{fig:me_vs_njoy_error} shows the percent error and the absolute relative error between the $S(\alpha,\beta)$ values produced by the translated and original LEAPR, that were plotted in Fig.~\ref{fig:me_vs_njoy_sab}.  Notice that the percent error is significantly lower in the $\beta$ regions where $S(\alpha,\beta)$ is of reasonable size. 
     \begin{figure}[h]
       \begin{center}
-        %\includegraphics[width=0.70\textwidth]{images/me-vs-njoy-1c}
-        \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-3c}
-        \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-4c}
-        \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 (\% Error) ]{Comparison of translated vs. legacy LEAPR, for test \#9, with the percent error plotted. Note that in the $\beta$ region where percent error increases, is the same region in Fig.~\ref{fig:me_vs_njoy_sab} where the $S(\alpha,\beta)$ values become significantly smaller.}
+        \includegraphics[width=0.49\textwidth]{images/me-vs-njoy-3c}
+        \includegraphics[width=0.49\textwidth]{images/me-vs-njoy-4c}
+        \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 (\% Error) ]{Comparison of translated vs. legacy LEAPR, for test \#9, with the percent error plotted. Note that large percent error is paired with small absolute error, and is generally of negligible consequence.}
         \label{fig:me_vs_njoy_error}
       \end{center}
     \end{figure}
-
-
-
     Thus, the translated version of LEAPR is considered an adequate tool for processing thermal data for the following discussion. However, conclusions drawn using the translated LEAPR will be verified alongside those drawn from the legacy LEAPR. Note that the translated LEAPR was also tested against legacy LEAPR with other cases considered.
 
 
+    \subsubsection{Features of $S(\alpha,\beta)$}
 
-    Fig.~\ref{fig:me_vs_njoy_sab} contains many sharp peaks, at $\beta$ values of 7.99, 15.99, 18.79, and 26.79. With the material temperature equal to 296 K, these $\beta$ values can be converted into energy changes in eV, as listed in Table~\ref{tab:spikeLocations}. H
-
+    Fig.~\ref{fig:me_vs_njoy_sab} contains many sharp peaks, at specific $\beta$ values. Using the material temperature $T=296$ K and the definition of $\beta$ from Eq.~\ref{eq:beta}, these peaks are converted to eV. The peak locations, both $\beta$ and eV values, are presented in Table~\ref{tab:spikeLocations}.
   \begin{table}[h]
     \centering
-    \caption[Locations of Peaks in $S(\alpha,\beta)$ Spectrum that Arise From Oscillator Behavior]{Locations of Peaks in $S(\alpha,\beta)$ Spectrum that Arise From Oscillator Behavior. This includes some of the main peaks in Fig.~\ref{fig:me_vs_njoy_sab}, their corresponding values in units of eV (assuming a temperature of 296 K), and the physical reason for the peak. These values arise as a result of Eq.~\ref{eq:finalDelta} where all discrete oscillator combinations are considered in the sums. Here, $E_1$ and $E_2$ correspond to the discrete oscillator energies defined for this problem in Table~\ref{tab:amended_delta_facts}.}
+    \caption[Locations of Peaks in $S(\alpha,\beta)$ Spectrum that Arise From Oscillator Behavior]{Locations of Peaks in $S(\alpha,\beta)$ Spectrum that Arise From Oscillator Behavior. This includes some of the main peaks in Fig.~\ref{fig:me_vs_njoy_sab}, their corresponding energy values, and the physical reason for the peak. }%These values arise as a result of Eq.~\ref{eq:finalDelta} where all discrete oscillator combinations are considered in the sums. Here, $E_1$ and $E_2$ correspond to the discrete oscillator energies defined for this problem in Table~\ref{tab:amended_delta_facts}.}
     \label{tab:spikeLocations}
     \begin{tabular}{ |c|c|c| }\hline
       $\beta$ Locations of Peaks& $\Delta E$ Value (eV) & Origin \\\hline
@@ -163,6 +157,13 @@
       26.79 & 0.683 & $E_1+E_2$ \\\hline
     \end{tabular}\\[1ex]
   \end{table}
+  Included in Table~\ref{tab:spikeLocations} are the physical reasons for each of these main peaks shown. Recall Eq.~\ref{eq:finalDelta}, 
+  \begin{equation}
+S^{(s,1,2)}_{n.sym}(\alpha,\beta)=\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)\sum_{n=-\infty}^{\infty}A_{1,n}(\alpha)S^{(s)}_{n.sym}\left(\alpha,\beta-n\beta_1-m\beta_2\right)\tag{\ref{eq:finalDelta}}
+  \end{equation}
+  which illustrates the form of the scattering law, when the results of a continuous spectrum is combined with those of two oscillators, located at $\beta_1$ and $\beta_2$. This indicates the importance of $\beta$ values that are integer, linear combinations of oscillator locations $\beta_1$ and $\beta_2$.
+
+
 
 
 

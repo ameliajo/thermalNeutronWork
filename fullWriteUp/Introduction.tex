@@ -78,11 +78,11 @@
 			\begin{equation}
 				P(\beta)=\frac{\rho(\beta)}{2\beta\sinh(\beta/2)}.
 			\end{equation}
-			Note that $\rho(\beta)$ is the phonon distribution or excitation frequency spectrum characteristic to the material, and that it normalizes to unity,
+			Here, $\rho(\beta)$ is the phonon distribution or excitation frequency spectrum that is characteristic to the material, which normalizes to unity,
 			\begin{equation}
 				\int_{0}^{\infty}\rho(\beta)d\beta=1.
 			\end{equation}
-			Note that to get to this point, the only assumption made is that equating the form of incoherent inelastic scattering with that of coherent elastic scattering (incoherent approximation). At this point, LEAPR decomposes the frequency spectrum $\rho(\beta)$,
+			To get to this point, the only assumption made was to equate the form of incoherent inelastic scattering with that of coherent elastic scattering (incoherent approximation). At this point, LEAPR decomposes the frequency spectrum $\rho(\beta)$,
 			\begin{equation}
 				\rho(\beta)=\sum_{j=1}^{\#~\mbox{osc.}}\omega_j\delta(\beta_j)+\rho_s(\beta)+\rho_t(\beta))
 			\end{equation}
@@ -176,8 +176,7 @@
                                   =&\int_{-\infty}^{\infty}\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)\delta\left(\beta'-m\beta_2\right)S^{(s,1)}_{n.sym}\left(\alpha,\beta-\beta'\right)d\beta'\\
                                   =&\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)S^{(s,1)}_{n.sym}\left(\alpha,\beta-m\beta_2\right)\\
                                   =&\sum_{m=-\infty}^{\infty}A_{2,m}(\alpha)\sum_{n=-\infty}^{\infty}A_{1,n}(\alpha)S^{(s)}_{n.sym}\left(\alpha,\beta-n\beta_1-m\beta_2\right)
-\\
-                                \end{align}
+                                \label{eq:finalDelta}\end{align}
 
 
 
@@ -223,8 +222,10 @@
 
 	\section{Areas of Improvement}
 		\subsection{Input Phonon Distribution Approximations}
+                Just to let you know, I intend to address the $\delta$ function approximation.
 
 		\subsection{Sampling from $S(\alpha,\beta,T)$}
+                Similarly, I'll let you know here that sampling can be a tough problem with $S(\alpha,\beta)$, so we'll address Pavlou's paper.
 
 
 

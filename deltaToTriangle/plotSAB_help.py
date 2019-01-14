@@ -21,9 +21,9 @@ def plotBetaForVariousAlpha(alphaVals,betaVals,sab,A0,E,kbT,scalarMap,style,addL
                 validBeta.append(beta)
                 validSab.append(a_i_b_all[b])
         if addLabel:
-            plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a),marker=style,linewidth=1)
+            plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a),marker=style,linewidth=1,markersize=0)
         else:
-            plt.plot(validBeta,validSab,color=scalarMap.to_rgba(a),marker=style,linestyle='--',linewidth=1)
+            plt.plot(validBeta,validSab,color=scalarMap.to_rgba(a),marker=style,linestyle='--',linewidth=1,markersize=0)
 
 
     #plt.legend(loc='best')
@@ -71,6 +71,27 @@ def plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,sca
     plt.xlabel('beta')
     plt.ylabel('S(a,b) Error (in %)')
     #plt.ylabel('S(a,b) Absolute Relative Error')
+
+
+def plotRelativeErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,scalarMap):
+
+    nalpha, nbeta = len(alphaVals), len(betaVals)
+    # Plotting all beta for given alpha
+    for a,alpha in enumerate(alphaVals):
+        a_i_b_all_Good = sabGood[a*nbeta:(a+1)*nbeta]
+        a_i_b_all_Test = sabTest[a*nbeta:(a+1)*nbeta]
+        validBeta = []
+        validSab  = []
+        for b,beta in enumerate(betaVals):
+            if isValidABCombo(alpha,beta,A0,E,kbT) or True:
+                validBeta.append(beta)
+                validSab.append(abs(a_i_b_all_Test[b]-a_i_b_all_Good[b]))
+        plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a))
+
+
+    #plt.legend(loc='best')
+    plt.xlabel('beta')
+    plt.ylabel('S(a,b) Absolute Relative Error')
 
 
 

@@ -17,6 +17,7 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
   double za, awr, spr, aws, sps, delta, twt, c, tbeta, dka, b7;
   std::vector<double> temp_vec,kappa;
 
+  /*
   std::cout << "Running Amelia's LEAPR" << std::endl;
   std::cout << "  Alpha ";
   for ( auto& a : alpha ) { std::cout << a << " ";}
@@ -31,6 +32,7 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
   std::cout << "\n  Rho   ";
   for ( auto& b : rho ) { std::cout << b << " ";}
   std::cout << std::endl;
+  */
 
 
 
@@ -42,7 +44,7 @@ auto runLEAPR( const T& alpha, const T& beta, const T& rho, int nd,
   awr    = 0.99917; spr    = 20.449; npr   = 2;   iel = 0;   ncold = 0; // Card 5
   nss    = 1;       b7     = 1.;     aws   = 1.1; sps = 3.8883; mss = 1; 
                                                                         // Card 6
-  nalpha = 5;       nbeta  = 7;      lat   = 1;                         // Card 7
+  nalpha = 5;       nbeta  = 7;      lat   = 0;                         // Card 7
   temp_vec   = { 296.0 };                                               // Card 10 
   delta  = 0.00255;     ni     = 67;                                    // Card 11
                                                                         // Card 12

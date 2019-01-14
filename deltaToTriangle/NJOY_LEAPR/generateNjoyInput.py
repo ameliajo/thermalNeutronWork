@@ -7,7 +7,7 @@ intro = \
     "leapr"+str('\n')+\
     "24 /"+str('\n')+\
     "'h in h2o, shortened endf model'/"+str('\n')+\
-    "1 1/"+str('\n')+\
+    "1 2/"+str('\n')+\
     " 101 1001/"+str('\n')+\
     " 0.99917 20.449 2 0 0/"+str('\n')+\
     " 1 1 15.85316 3.8883 1/"+str('\n')
@@ -28,7 +28,7 @@ def writeTillEndOfLine(f,vec):
 def generateNjoyInput(fileName,alphaVals,betaVals,phononDist,deltaFuncs):
     with open(fileName,'w') as f:
         f.write(intro)
-        f.write(str(len(alphaVals))+" "+str(len(betaVals))+" 1/\n")
+        f.write(str(len(alphaVals))+" "+str(len(betaVals))+"/\n")
         writeTillEndOfLine(f,alphaVals)
         writeTillEndOfLine(f,betaVals)
 
@@ -57,7 +57,7 @@ def runNJOY(fileName):
     subprocess.call("~/NJOY2016/bin/njoy < "+str(fileName),shell=True)
     subprocess.run(['mv','./sab.txt','./NJOY_LEAPR/sabResults/sab_'+fileName+'.txt'])
     subprocess.run(['mv',fileName,'./NJOY_LEAPR/njoyInputs/'])
-    subprocess.run(['rm','tape24','output'])
+    #subprocess.run(['rm','tape24','output'])
 
 
 if __name__=='__main__':

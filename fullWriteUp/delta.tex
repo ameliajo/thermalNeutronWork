@@ -36,25 +36,42 @@
   In order to allow users to avoid the $\delta$ function approximation that is commonly used in NJOY's LEAPR module, it is crucial to demonstrate similar behavior between how the solid-type, continuous treatment vs. discrete oscillator treatment processes sharp peaks. For this discussion, Test Problem 9, which was described in Sec.~\ref{sec:test9} is considered. To allow for more flexible analysis, LEAPR's source code was translated from Fortran to C++. So first, the results of the translated C++ LEAPR are compared against legacy Fortran LEAPR for the simple H in H$_2$O model, to establish validity in the method. Then, the discrete oscillators in Test Problem 9 are replaced with triangles of varying thickness, to illustrate that as the thickness of the triangle decreases, it approaches the behavior characteristic of a $\delta$ function oscillator.
   \subsection{Equivalence of Revised-LEAPR to Legacy-LEAPR}
     NJOY's LEAPR module was translated from Fortran to C++, so as to provide flexibility in later analysis. The C++ translation must of course replicate the original NJOY code adequately. To illustrate this, Fig.~\ref{fig:me_vs_njoy_sab} contains $S(\alpha,\beta)$ as it was calculated using both the original LEAPR code, as well as the translated LEAPR code. Note that the for nearly all $\alpha,\beta$ values shown, the two datasets are virtually indistinguishable from each other. 
+    %\begin{figure}[H]
+    %  \begin{center}
+    %    \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-1b}
+    %    \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Test \#9 $S(\alpha,\beta)$ results, comparing translated vs. legacy LEAPR for H in H$_2$O Test \#9 Input, which are represented using dotted and dashed lines, respectively.}
+    %    \label{fig:me_vs_njoy_sab}
+    %%  \end{center}
+    %\end{figure}
     \begin{figure}[H]
       \begin{center}
-        %\includegraphics[width=0.415\textwidth]{images/me-vs-njoy-1}
-        %\includegraphics[width=0.485\textwidth]{images/me-vs-njoy-2}
-        \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-1b}
-        %\includegraphics[width=0.52\textwidth]{images/me-vs-njoy-2}
-        %\caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Comparison of $S(\alpha,\beta)$ results, comparing translated (C++) vs. legacy (Fortran) LEAPR for H in H$_2$O Test \#9 Input. The translated- and legacy-generated results are represented with dotted and solid lines, respectively.}
-        \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Test \#9 $S(\alpha,\beta)$ results, comparing translated vs. legacy LEAPR for H in H$_2$O Test \#9 Input, which are represented using dotted and dashed lines, respectively.}
+        \includegraphics[width=0.85\textwidth]{images/me-vs-njoy-1c}
+        \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 ($S(\alpha,\beta)$)]{Test \#9 $S(\alpha,\beta)$ results, comparing translated vs. legacy LEAPR for H in H$_2$O Test \#9 Input, which are represented using dotted and dashed lines, respectively. Note the sharp peaks that characterize the $S(\alpha,\beta)$ plots, which correspond to sum values in Eq.~\ref{eq:finalDelta}. They are located at 7.99, 18.79, 26.79, 15.99 eV which correspond to  }
         \label{fig:me_vs_njoy_sab}
       \end{center}
     \end{figure}
 
+
+
+
+    %\begin{figure}[H]
+    %  \begin{center}
+    %    \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-3b}
+    %    \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 (\% Error) ]{Comparison of translated vs. legacy LEAPR, for test \#9, with the percent error plotted. Note that in the $\beta$ region where percent error increases, is the same region in Fig.~\ref{fig:me_vs_njoy_sab} where the $S(\alpha,\beta)$ values become significantly smaller.}
+    %    \label{fig:me_vs_njoy_error}
+    %  \end{center}
+    %\end{figure}
     \begin{figure}[H]
       \begin{center}
-        \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-3b}
+        %\includegraphics[width=0.70\textwidth]{images/me-vs-njoy-1c}
+        \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-3c}
+        \includegraphics[width=0.75\textwidth]{images/me-vs-njoy-4c}
         \caption[Comparison of Translated vs. Legacy LEAPR, for Test \#9 (\% Error) ]{Comparison of translated vs. legacy LEAPR, for test \#9, with the percent error plotted. Note that in the $\beta$ region where percent error increases, is the same region in Fig.~\ref{fig:me_vs_njoy_sab} where the $S(\alpha,\beta)$ values become significantly smaller.}
         \label{fig:me_vs_njoy_error}
       \end{center}
     \end{figure}
+
+
 
     Fig.~\ref{fig:me_vs_njoy_error} shows the percent error between the $S(\alpha,\beta)$ values produced by the translated and original LEAPR, that were plotted in Fig.~\ref{fig:me_vs_njoy_sab}.  Notice that the percent error is significantly lower in the $\beta$ regions where $S(\alpha,\beta)$ is of reasonable size. 
 

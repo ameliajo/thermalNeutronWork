@@ -88,6 +88,8 @@ if __name__=="__main__":
     betas = [0.1001*i for i in range(300)]
     alphas= [0.1*i for i in range(1,15)]
 
+    betas += [8.05,8.15,7.95]
+    betas.sort()
 
 
 
@@ -103,9 +105,9 @@ if __name__=="__main__":
     oscW = [ 0.166667, 0.333333 ]
 
     fullRedo = True
-    #opt0,opt1 = ('mine',None),('mine',2) # Works
+    opt0,opt1 = ('mine',None),('mine',2) # Works
     #opt0,opt1 = ('njoy',None),('njoy',2) # Works
-    opt0,opt1 = ('mine',None),('njoy',None) # Works
+    #opt0,opt1 = ('mine',None),('njoy',None) # Works
     #opt0,opt1 = ('mine',2),('njoy',2) # Works
     #opt0,opt1 = ('mine',None),('njoy',2) # FAILS, diagonal comparison
     #opt0,opt1 = ('njoy',None),('mine',2) # FAILS, diagonal comparison

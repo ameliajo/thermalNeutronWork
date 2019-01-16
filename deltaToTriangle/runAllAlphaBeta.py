@@ -88,7 +88,11 @@ if __name__=="__main__":
     betas = [0.1001*i for i in range(300)]
     alphas= [0.1*i for i in range(1,15)]
 
-    betas += [8.05,8.15,7.95]
+    betas += [7.8+0.01*i for i in range(50)]
+    betas += [15.8+0.01*i for i in range(50)]
+    betas += [18.5+0.01*i for i in range(50)]
+    betas += [26.5+0.01*i for i in range(50)]
+
     betas.sort()
 
 

@@ -67,7 +67,7 @@ ax.set_facecolor('xkcd:off white')
 
 
 NJOY_LEAPR = True
-fullRedo = False
+fullRedo = True
 sabDELTA = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     
 sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) for width in widths]

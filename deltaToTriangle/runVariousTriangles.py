@@ -6,6 +6,7 @@ import matplotlib.colors as c
 import matplotlib.cm as cmx
 from generateNjoyInput import *
 from getSAB import *
+import numpy as np
 
 # The point of this is program is to run the H in H2O LEAPR case, at T=296K,
 # with its normal delta-function representation (phonon distribution is 
@@ -16,7 +17,13 @@ from getSAB import *
 
 
 alphas = [0.001, 0.01, 0.05, 0.1, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7 ]
-betas = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.6, 7.7, 7.8, 7.9, 8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 9, 10, 12, 14, 16, 18, 20]
+betas = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.6, 7.7, 7.8, 7.9, 7.95,8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 9, 10, 12, 14, 16, 18, 20]
+betas = [7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.95,8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9.0]
+betas = [7.0 + 0.01*i for i in range(200)]
+betas = [7.5 + 0.02*i for i in range(50)]
+
+
+
  
  # This is the part of the phonon distribution that is not usually approximated
  # using delta functions (lower E). 
@@ -36,6 +43,7 @@ widths = list(range(2,12,2))
 
 NJOY_LEAPR = False
 fullRedo = False
+fullRedo = True
 sabDELTA = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     
 sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) for width in widths]
@@ -48,35 +56,20 @@ cMap = cmx.ScalarMappable(c.Normalize(0,10),plt.get_cmap('tab10')) #hot autumn t
 colors = [cMap.to_rgba(i) for i in range(2*len(widths)+1)]
 
 a = 9
-plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],'.','with delta funcs',3)
+plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],'.','discrete oscillator',2)
 for i in range(len(widths)):
     plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1],\
-                    '.','triangle, width = '+ str(widths[i])+' spaces',3)
+                    '.','triangle of width '+ str('%.4f'%(widths[i]*0.00255))+' eV',2)
 
 
 
-#plt.legend(loc='best')
+plt.legend(loc='best')
 ax = plt.gca()
+#plt.yscale('log')
 LEAPR_type = "NJOY LEAPR" if NJOY_LEAPR else "MY LEAPR"
 plt.title('S(a,b) values for water, delta vs. various triangles.\n Generated using '+LEAPR_type+', for alpha = '+str(alphas[a]))
 ax.set_facecolor('xkcd:light grey blue')
 ax.set_facecolor('xkcd:off white')
-#plt.show()
-
-
-
-
-NJOY_LEAPR = True
-fullRedo = True
-sabDELTA = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
-    
-sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) for width in widths]
-
-plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0+len(widths)],'X','with delta funcs')
-for i in range(len(widths)):
-    plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1+len(widths)],\
-                    'X','triangle, width = '+ str(widths[i])+' spaces',1)
-
-plt.legend(loc='best')
 plt.show()
+
 

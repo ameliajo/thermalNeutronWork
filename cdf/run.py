@@ -1,4 +1,3 @@
-from test09_sab import *
 import matplotlib.pyplot as plt
 from plotHelp import *
 
@@ -94,47 +93,62 @@ def generateEq20(sab,alphas,n_beta,a_min,a_max):
             H[a][b] = (eq19[a][b] - H_min) / (H_max - H_min)
     return H
 
-"""
-alphas = [0.01,0.02,0.03,0.04]
-betas  = [0.1,0.2,0.3]
-sab = [5.0,4.8,4.6,  1.0,0.8,0.6,   2.0,1.8,1.6,   4.0,3.8,3.6]
-"""
-n_beta = len(betas)
-n_alpha = len(alphas)
-
  
-H = generateEq20(sab,alphas,n_beta,0,n_alpha-1)
-H_transpose = list(map(list, zip(*H)))
-
-h = getEq18(sab,alphas,n_beta)
-h_transpose = list(map(list, zip(*h)))
-
-"""
-for b in range(n_beta):
-    plt.plot(alphas,H_transpose[b])
-    plt.plot(alphas,H_transpose[b],'o')
-"""
-
-#for b in range(n_beta):
-#    plt.plot(alphas,[getSABval(sab,a,b,n_beta) for a in range(n_alpha)])
-#    plt.plot(alphas,[getSABval(sab,a,b,n_beta) for a in range(n_alpha)],'o')
-#plt.show()
-
-
-#scalarMap, colorBar = prepPlot(alphas)
-#for b in range(n_beta):
-#    plt.plot(alphas,H_transpose[b],label='beta: '+str(betas[b]),color=scalarMap.to_rgba(b))
-#finishPlotting(colorBar,'H(a|b)')
-
-scalarMap, colorBar = prepPlot(alphas)
-for b in range(n_beta):
-    plt.plot(alphas,h_transpose[b],label='beta: '+str(betas[b]),color=scalarMap.to_rgba(b))
-finishPlotting(colorBar,'h(a|b)')
-
-
 
 
 
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
+    simpleTest = True
+    simpleTest = False 
+
+    if simpleTest:
+        # Simple Test
+        alphas = [0.01,0.02,0.03,0.04]
+        betas  = [0.1,0.2,0.3]
+        sab = [5.0,4.8,4.6,  1.0,0.8,0.6,   2.0,1.8,1.6,   4.0,3.8,3.6]
+    else:
+        # H in H2O Test
+        from test09_sab import *
+    n_beta = len(betas)
+    n_alpha = len(alphas)
+
+    plotPDF = True
+    plotCDF = True
+    plotSAB = True
+
+    plotPDF = False
+    plotCDF = False
+    plotSAB = False
+
+    if plotPDF:
+        h = getEq18(sab,alphas,n_beta)
+        h_transpose = list(map(list, zip(*h)))
+        scalarMap, colorBar = prepPlot(alphas)
+        for b in range(n_beta):
+            plt.plot(alphas,h_transpose[b],label='beta: '+str(betas[b]),color=scalarMap.to_rgba(b))
+        finishPlotting(colorBar,'h(a|b)','alpha','h(a|b)')
+    if plotPDF:
+        H = generateEq20(sab,alphas,n_beta,0,n_alpha-1)
+        H_transpose = list(map(list, zip(*H)))
+        scalarMap, colorBar = prepPlot(alphas)
+        for b in range(n_beta):
+            plt.plot(alphas,H_transpose[b],label='beta: '+str(betas[b]),color=scalarMap.to_rgba(b))
+        finishPlotting(colorBar,'H(a|b)','alpha','H(a|b)')
+    if plotSAB:
+        scalarMap, colorBar = prepPlot(alphas)
+        for b in range(n_beta):
+            plt.plot(alphas,[getSABval(sab,a,b,n_beta) for a in range(n_alpha)],label='beta: '+str(betas[b]),color=scalarMap.to_rgba(b))
+        finishPlotting(colorBar,'S(a,b)','alpha','S(a,b)')
+
+
+
+
+    
+
+
+
+
+

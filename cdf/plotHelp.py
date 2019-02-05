@@ -14,12 +14,14 @@ def prepPlot(alphas):
 
 
 
-def finishPlotting(colorBar,title):
+def finishPlotting(colorBar,title,xlabel,ylabel):
     ax = plt.gca()
-    plt.colorbar(colorBar).ax.set_ylabel('alpha values')
+    plt.colorbar(colorBar).ax.set_ylabel('beta values')
     plt.title(title)
     ax.set_facecolor('xkcd:light grey blue') # off white
     #plt.yscale('log')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.show()
 
 

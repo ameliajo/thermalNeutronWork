@@ -16,11 +16,10 @@ def getAlphaMinMax(E,beta,kb,T,A):
     return aMin,aMax
 
 
-def plotAlphaPDF(A,E,T,beta):
+def calcAlphaPDF(A,E,T,beta):
     kb = 8.6173303e-5
     aMin,aMax = getAlphaMinMax(E,beta,kb,T,A)
     alphas = list(np.linspace(aMin,aMax,1000))
-    print(T,aMin,aMax)
 
     denominator = 0.0
     for a in range(len(alphas)-1):
@@ -31,19 +30,44 @@ def plotAlphaPDF(A,E,T,beta):
     eq15 = [0.0]*len(alphas)
     for a in range(len(eq15)):
         eq15[a] = calcSym(alphas[a],beta)/denominator
+    return alphas,eq15
 
-    plt.plot(alphas,eq15)
-    #print(np.trapz(eq15, x=alphas))
+def calcAlphaCDF(eq15,alphas):
+    eq16 = [0.0]*len(eq15)
+    for a in range(1,len(alphas)):
+        eq16[a] = eq16[a-1]+eq15[a]*(alphas[a]-alphas[a-1])
+    return eq16
 
 
-A = 18.0 
-E = 7.0    # 1 eV
+
+
+def PDF_CDF_at_various_temps(A,E,temps,beta):
+    alpha_vecs, eq15_vecs, eq16_vecs = [], [], []
+    for T in temps:
+        alphas, eq15 = calcAlphaPDF(A=A,E=E,T=T,beta=beta)
+        eq16 = calcAlphaCDF(eq15,alphas)
+        alpha_vecs.append(alphas)
+        eq15_vecs.append(eq15)
+        eq16_vecs.append(eq16)
+
+    for i in range(len(temps)):
+        plt.plot(alpha_vecs[i],eq15_vecs[i])
+    plt.show()
+
+    for i in range(len(temps)):
+        plt.plot(alpha_vecs[i],eq16_vecs[i])
+    plt.show()
+
+A = 18.0
+#cA = 1.0
+E = 1.0 
 beta = 10
-plotAlphaPDF(A=A,E=E,T=300.0,beta=beta)
-plotAlphaPDF(A=A,E=E,T=475.0,beta=beta)
-plotAlphaPDF(A=A,E=E,T=650.0,beta=beta)
-plotAlphaPDF(A=A,E=E,T=825.0,beta=beta)
-plotAlphaPDF(A=A,E=E,T=1000.0,beta=beta)
-plt.show()
+#temps = [300.0,650.0,1000.0,1500.0,2000.0] # Graphite
+temps = [300.0,475.0,650.0,825.0,1000.0]   # Water
+PDF_CDF_at_various_temps(A=A,E=E,temps=temps,beta=beta)
+
+
+
+
 
 

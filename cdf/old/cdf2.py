@@ -9,6 +9,8 @@ from math import exp
 
 sab = sabSym[:]
 
+print(len(alphas))
+print(len(betas))
 def getAlphaMinMax(E,beta,kb,T,A):
     aMin = ( (E)**0.5 - (E+(beta)*kb*T)**0.5 )**2 / ( A*kb*T )
     aMax = ( (E)**0.5 + (E+(beta)*kb*T)**0.5 )**2 / ( A*kb*T )
@@ -96,6 +98,7 @@ eq14 = [x * invIntegral for x in eq14]
 f = plt.figure(1)
 plt.plot(betaTotal,eq14)
 f.show()
+plt.show()
 #hold = input()
 
 

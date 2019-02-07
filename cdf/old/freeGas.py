@@ -102,9 +102,5 @@ f = plt.figure(1)
 plt.plot(beta,eq14)
 f.show()
 hold = input()
-"""
-
-
-"""
 
 

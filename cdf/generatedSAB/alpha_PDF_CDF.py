@@ -18,7 +18,7 @@ def calcAsym(alpha,beta):
 
 
 def calcSym(alpha,beta):
-    return 10*np.exp(beta*0.5)*calcAsym(alpha,beta)
+    return np.exp(beta*0.5)*calcAsym(alpha,beta)
 
 
 def getAlphaMinMax(E,beta,kb,T,A):

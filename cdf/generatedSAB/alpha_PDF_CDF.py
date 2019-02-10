@@ -65,7 +65,6 @@ E = 10.0
 beta = 10
 #temps = [300.0,650.0,1000.0,1500.0,2000.0] # Graphite
 temps = [300.0,475.0,650.0,825.0,1000.0]   # Water
-#temps = [300.0]   # Water
 PDF_CDF_at_various_temps(A=A,E=E,temps=temps,beta=beta)
 
 

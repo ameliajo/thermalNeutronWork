@@ -8,54 +8,6 @@ from generateNjoyInput import *
 from getSAB import *
 import numpy as np
 
-# The point of this is program is to run the H in H2O LEAPR case, at T=296K,
-# with its normal delta-function representation (phonon distribution is 
-# approximated using delta functions at higher energy), as well as with a 
-# similar triangle representation. LEAPR handles triangles different than delta
-# functions, and so I'm looking at how changing the width of the triangles will
-# impact the resultant S(a,b).
-
-
-xs_bound = 2.0
-kb = 8.61733e-5
-T = 296.0
-E = 1.0
-mu_vec = list(np.linspace(-1,1,12))
-Ep_vec = list(np.linspace(E,1.5,20))
-Ep_vec = list(np.linspace(0.0,2.0,500))
-A = 18.0
-
-
-alphas = [1e-7+ 0.05*i for i in range(500)]
-betas = [0.5*i for i in range(100)]
-
- 
- # This is the part of the phonon distribution that is not usually approximated
- # using delta functions (lower E). 
-continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
-  .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
-  .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
-  .09126, .0871, .0839, .0807, .07798, .07574, .0735, .07162, .06974, .06804,  \
-  .06652, .065, .0634, .0618, .06022, .05866, .0571, .05586, .05462, .0535,    \
-  .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
-  .04244, .042, 0.0]
-
-
-oscE = [ 0.204,    0.4794   ]
-oscW = [ 0.166667, 0.333333 ]
-
-widths = list(range(2,12,2))
-widths = [2] 
-
-NJOY_LEAPR = False
-NJOY_LEAPR = True
-fullRedo = True
-fullRedo = False
-sabDELTA = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
-    
-sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) for width in widths]
-
-
 def findBounds(vec,val):
     for i in range(len(vec)-1):
         if vec[i] <= val <= vec[i+1]:
@@ -69,32 +21,125 @@ def interpolate(x1,x2,y1,y2,x):
     return m*x + b
 
 
-for mu in mu_vec:
-    sab_vec = []
-    for Ep in Ep_vec:
-        alpha = ( Ep + E - (2*mu*(Ep*E)**0.5) )/(A*kb*T)
-        beta  = ( Ep - E )/(kb*T)
 
-        a = findBounds(alphas,alpha)
-        b = findBounds(betas,abs(beta))
+def prepPlot(vec):
+    cnorm = c.Normalize(vmin=0,vmax=len(vec)+1)
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
+    mymap = c.LinearSegmentedColormap.from_list('funTestColors',\
+            [scalarMap.to_rgba(a) for a in range(len(vec))])
+    colorBar = plt.contourf([[0,0],[0,0]], vec, cmap=mymap)
+    plt.clf()
+    return scalarMap, colorBar
 
-        alphaL = alphas[a]
-        alphaR = alphas[a+1]
-        betaL = betas[b]
-        betaR = betas[b+1]
 
-        sab_betaL = interpolate(alphaL,alphaR,sabDELTA[a*len(betas)+b],sabDELTA[(a+1)*len(betas)+b],alpha)
-        sab_betaR = interpolate(alphaL,alphaR,sabDELTA[a*len(betas)+b+1],sabDELTA[(a+1)*len(betas)+b+1],alpha)
 
-        sabVal = interpolate(betaL,betaR,sab_betaL,sab_betaR,abs(beta))
-        if (beta < 0):
-            sabVal *= np.exp(abs(beta))
+def finishPlotting(colorBar,colorBarName):
+    ax = plt.gca()
+    plt.colorbar(colorBar).ax.set_ylabel(colorBarName)
+    ax.set_facecolor('xkcd:light grey blue') # off white
+    plt.xlabel("E' (eV)")
+    plt.show()
 
-        sab_vec.append(sabVal)
+alphas = [1e-7+ 0.05*i for i in range(500)]
+betas = [0.5*i for i in range(100)]
+continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
+  .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
+  .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
+  .09126, .0871, .0839, .0807, .07798, .07574, .0735, .07162, .06974, .06804,  \
+  .06652, .065, .0634, .0618, .06022, .05866, .0571, .05586, .05462, .0535,    \
+  .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
+  .04244, .042, 0.0]
 
-    plt.plot(Ep_vec,sab_vec,label='mu = '+str(mu))
-plt.legend(loc='best')
-plt.show()
+
+oscE = [ 0.204,    0.4794   ]
+oscW = [ 0.166667, 0.333333 ]
+
+
+
+
+def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec):
+    xs_each_mu = []
+    for i,mu in enumerate(mu_vec):
+        sab_vec = []
+        xs_vec = []
+        for Ep in Ep_vec:
+            alpha = ( Ep + E - (2*mu*(Ep*E)**0.5) )/(A*kb*T)
+            beta  = ( Ep - E )/(kb*T)
+
+            a,b = findBounds(alphas,alpha), findBounds(betas,abs(beta))
+    
+            alphaL, alphaR = alphas[a], alphas[a+1]
+            betaL , betaR  = betas[b] , betas[b+1]
+
+            sab_betaL = interpolate(alphaL,alphaR,sab[a*len(betas)+b],\
+                                    sab[(a+1)*len(betas)+b],alpha)
+            sab_betaR = interpolate(alphaL,alphaR,sab[a*len(betas)+b+1],\
+                                     sab[(a+1)*len(betas)+b+1],alpha)
+
+            sabVal = interpolate(betaL,betaR,sab_betaL,sab_betaR,abs(beta))
+            if (beta < 0): sabVal *= np.exp(abs(beta))
+
+            xs_vec.append((xs_bound/2*kb*T)*(Ep/E)**0.5*sabVal)
+        xs_each_mu.append(xs_vec)
+    return xs_each_mu
+
+
+
+
+if __name__=="__main__":
+    plot_Ep_mu = True
+    plot_Ep_Width = True
+    
+    xs_bound = 20.43634
+    kb = 8.61733e-5
+    T = 296.0
+    E = 1.0
+    A = 18.0
+    Ep_vec = list(np.linspace(0.0,1.5,500))
+    widths = list(range(2,12,2))
+
+    NJOY_LEAPR = True
+    fullRedo = False
+    sabDELTA   = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
+    sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) \
+                  for width in widths]
+
+    if plot_Ep_mu:
+        mu_vec = list(np.linspace(-1,1,20))
+        scalarMap, colorBar = prepPlot(mu_vec)
+        xs_vec = getXS_from_SAB(sabDELTA,alphas,betas,E,kb,T,Ep_vec,mu_vec)
+        for i in range(len(mu_vec)):
+            plt.plot(Ep_vec,xs_vec[i],color=scalarMap.to_rgba(i))
+        finishPlotting(colorBar,'mu')
+
+    if plot_Ep_Width:
+        mu = 0.5
+        scalarMap, colorBar = prepPlot([0]+widths)
+
+        xsDELTA = getXS_from_SAB(sabDELTA,alphas,betas,E,kb,T,Ep_vec,[mu])[0]
+        xsCONTINS = [getXS_from_SAB(sabCONTIN,alphas,betas,E,kb,T,Ep_vec,[mu])[0] \
+                     for sabCONTIN in sabCONTINS]
+
+        plt.plot(Ep_vec,xsDELTA,color=scalarMap.to_rgba(0))
+        for i,xsCONTIN in enumerate(xsCONTINS):
+            plt.plot(Ep_vec,xsCONTIN,color=scalarMap.to_rgba(i+1))
+
+        finishPlotting(colorBar,'triangleWidth')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

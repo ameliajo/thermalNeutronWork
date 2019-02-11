@@ -73,7 +73,7 @@ def plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,sca
     #plt.ylabel('S(a,b) Absolute Relative Error')
 
 
-def plotRelativeErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,scalarMap):
+def plotAbsoluteErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,scalarMap):
 
     nalpha, nbeta = len(alphaVals), len(betaVals)
     # Plotting all beta for given alpha
@@ -91,7 +91,7 @@ def plotRelativeErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E
 
     #plt.legend(loc='best')
     plt.xlabel('beta')
-    plt.ylabel('S(a,b) Absolute Relative Error')
+    plt.ylabel('S(a,b) Absolute Error')
 
 
 

@@ -21,8 +21,10 @@ betas = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.6, 7.7, 7.8, 7.9, 7.95,8, 8.05, 8.1, 8.
 betas = [7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.95,8, 8.05, 8.1, 8.15, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9.0]
 betas = [7.0 + 0.01*i for i in range(200)]
 betas = [7.5 + 0.02*i for i in range(50)]
+#betas = [7.0 + i for i in range(3)]
+#alphas = [1.0*i for i in range(5)]
 
-
+#alphas = [0.5]
 
  
  # This is the part of the phonon distribution that is not usually approximated
@@ -42,42 +44,44 @@ oscW = [ 0.166667, 0.333333 ]
 widths = list(range(2,12,2))
 
 NJOY_LEAPR = False
-fullRedo = True
 fullRedo = False
+fullRedo = True
 sabDELTA = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     
 sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) for width in widths]
 
-# These parameters are for making sure that we only consider logicat alpha, beta
-# combinations. 
-A0 = 18.02; E = 0.01; kbT = 0.025851
-
-cMap = cmx.ScalarMappable(c.Normalize(0,10),plt.get_cmap('tab10')) #hot autumn tab10
-colors = [cMap.to_rgba(i) for i in range(2*len(widths)+1)]
-
-a = 9
-#plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],'.','discrete oscillator',2)
-plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],None,'discrete oscillator',2)
-for i in range(len(widths)):
-    plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1],\
-                    None,'triangle, width '+ str('%.2E'%(widths[i]*0.00255))+' eV',2)
-    #plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1],\
-    #                '.','triangle of width '+ str('%.4f'%(widths[i]*0.00255))+' eV',2)
+# Sum over all values in the sab list, take difference
+error = [ sum( [abs(sabCONTIN[j]-sabDELTA[j]) for j in range(len(sabDELTA))] ) \
+          for sabCONTIN in sabCONTINS ]
 
 
 
+def integrateAcrossBeta(sabCONTIN,sabDELTA,a,betas):
+    val = 0.0
+    for b in range(len(betas)-1):
+        val_left  = abs(sabCONTIN[a*len(betas)+b]-sabDELTA[a*len(betas)+b])
+        val_right = abs(sabCONTIN[a*len(betas)+b+1]-sabDELTA[a*len(betas)+b+1])
+        val += (val_left+val_right)*0.5*(betas[b+1]-betas[b])
+    return val
+
+error = []
+for sabCONTIN in sabCONTINS:
+    errorVal = 0.0
+    for a in range(len(alphas)-1):
+       val_left = integrateAcrossBeta(sabCONTIN,sabDELTA,a,betas)
+       val_right = integrateAcrossBeta(sabCONTIN,sabDELTA,a+1,betas)
+       errorVal += (val_left + val_right)*0.5*(alphas[a+1]-alphas[a])
+    error.append(errorVal)
 
 
-plt.legend(loc='best')
-ax = plt.gca()
-#plt.yscale('log')
-LEAPR_type = "NJOY LEAPR" if NJOY_LEAPR else "MY LEAPR"
-#plt.title('S(a,b) values for water, delta vs. various triangles.\n Generated using '+LEAPR_type+', for alpha = '+str(alphas[a]))
-ax.set_facecolor('xkcd:light grey blue')
-ax.set_facecolor('xkcd:off white')
+widths = [0.00255*w for w in widths]
+plt.xticks(np.arange(min(widths), max(widths)+0.00255,2*0.00255))
+plt.plot(widths,error,marker='o')
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-plt.legend(loc='upper right')
-
+plt.xlabel('Triangle Width (eV)')
+plt.ylabel('Total Difference')
+#plt.title('Total absolute error between S(a,b) generated using delta\nfunctions vs. S(a,b) generated using triangles of various widths')
 plt.show()
+
 
 

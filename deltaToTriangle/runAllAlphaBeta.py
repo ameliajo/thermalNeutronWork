@@ -20,7 +20,7 @@ def prepPlot():
 def finishPlotting(colorBar,title):
     ax = plt.gca()
     plt.colorbar(colorBar).ax.set_ylabel('alpha values')
-    plt.title(title)
+    #plt.title(title)
     ax.set_facecolor('xkcd:light grey blue') # off white
     plt.yscale('log')
     plt.show()
@@ -61,8 +61,8 @@ def runAlphasBetas(opt0,opt1,alphas,betas,continRho,oscE,oscW,fullRedo=False):
     plotErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
     finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
     ########################################################################
-    # Compare S(a,b) errors (relative)
-    plotRelativeErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
+    # Compare S(a,b) errors (absolute)
+    plotAbsoluteErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
     finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
     ########################################################################
 
@@ -108,6 +108,7 @@ if __name__=="__main__":
     oscE = [ 0.204,    0.4794   ] 
     oscW = [ 0.166667, 0.333333 ]
 
+    fullRedo = False
     fullRedo = True
     opt0,opt1 = ('mine',None),('mine',2) # Works
     #opt0,opt1 = ('njoy',None),('njoy',2) # Works

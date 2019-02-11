@@ -19,27 +19,41 @@ def getAlphaMinMax(E,beta,kb,T,A):
     aMax = ( (E)**0.5 + (E+beta*kb*T)**0.5 )**2 / ( A*kb*T )
     return aMin,aMax
 
+
 n_beta = len(betas)
 freeSAB = [0.0]*(2*len(betas)-1)*len(alphas)
 fullBetas = [-x for x in betas[1:]][::-1] + betas
-for a in range(len(alphas)):
-    for b in range(len(fullBetas)):
-        freeSAB[a*len(fullBetas)+b] = (calcAsym(alphas[a],fullBetas[b]))
 
 fullSAB = [0.0]*(2*len(betas)-1)*len(alphas)
 for a in range(len(alphas)):
     for b in range(len(fullBetas)):
         b_for_positive_betas = abs(b-len(betas)+1)
-        beta = betas[b_for_positive_betas]
-        assert(abs(fullBetas[b]) == beta)
+        assert(abs(fullBetas[b]) == betas[b_for_positive_betas])
         # This creates the symmetric SAB
+        freeSAB[a*len(fullBetas)+b] = calcSym(alphas[a],fullBetas[b])
+        # We make it asymmetric to make sure it matches eq14
+        freeSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
+
+
+        # Assume my sab is symmetric
+        #fullSAB[a*len(fullBetas)+b] = getSABval(sab,a,b_for_positive_betas,len(betas))
+        # We make it asymmetric to make sure it matches eq14
+        #fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
+
+        # Assume my sab is non-symmetric
         fullSAB[a*len(fullBetas)+b] = getSABval(sab,a,b_for_positive_betas,len(betas))
-        #fullSAB[a*len(fullBetas)+b] = (calcSym(alphas[a],fullBetas[b]))
+        fullSAB[a*len(fullBetas)+b] *= np.exp(abs(fullBetas[b])*0.5)
+        if (fullBetas[b] < 0):
+            fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b])
         # We make it asymmetric to make sure it matches eq14
         fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
 
+plt.plot(fullBetas,[getSABval(fullSAB,50,b,len(fullBetas)) for b in range(len(fullBetas))],label='mine')
+plt.plot(fullBetas,[getSABval(freeSAB,50,b,len(fullBetas)) for b in range(len(fullBetas))],label='free')
+plt.legend(loc='best')
+plt.show()
 
-
+"""
 def getValidBetasRange(A,E,T,fullBetas):
     kb = 8.6173303e-5
     betaMin = -E/(kb*T)
@@ -62,10 +76,10 @@ def calcIntegralAcrossAlpha(A,E,T,fullBetas,b):
     denominator = 0.0
     for a in range(len(alphas)-1):
         if aMin <= alphas[a] <= aMax:
-            #sabL = getSABval(freeSAB,a,b,len(fullBetas))
-            #sabR = getSABval(freeSAB,a+1,b,len(fullBetas))
-            sabL = getSABval(fullSAB,a,b,len(fullBetas))
-            sabR = getSABval(fullSAB,a+1,b,len(fullBetas))
+            sabL = getSABval(freeSAB,a,b,len(fullBetas))
+            sabR = getSABval(freeSAB,a+1,b,len(fullBetas))
+            #sabL = getSABval(fullSAB,a,b,len(fullBetas))
+            #sabR = getSABval(fullSAB,a+1,b,len(fullBetas))
 
             denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
     return denominator
@@ -120,3 +134,4 @@ temps = [300.0,475.0,650.0,825.0,1000.0]   # Water
 temps = [300.0]   # Water
 PDF_CDF_at_various_temperatures(A,E,temps,fullBetas)
 
+"""

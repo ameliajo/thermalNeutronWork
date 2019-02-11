@@ -2,6 +2,7 @@ import sys
 sys.path.append('NJOY_LEAPR/')
 from generateNjoyInput import *
 from makeTest09Rho import *
+import numpy as np
 
 
 
@@ -33,6 +34,17 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
             betaVals  = getLine(f)
             assert(alphaVals == alphas)
             assert(betaVals == betas)
+        # So we actually just collected ssm, which is S_non.sym(a,-b). 
+        # S_non.sym(a,b) = e^b S_non.sym(a,-b)
+        for a in range(len(alphas)):
+            for b in range(len(betas)):
+                # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
+                sab[a*len(betas)+b] *= np.exp(-betas[b])
+
+                # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
+                #sab[a*len(betas)+b] *= np.exp(betas[b]*0.5)
+
+
         return sab
 
 
@@ -59,7 +71,19 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
         with open('MY_LEAPR/sabResults/'+name,'r') as f:
             sab = getLine(f)
 
+        # So we actually just collected ssm, which is S_non.sym(a,-b). 
+        # S_non.sym(a,b) = e^b S_non.sym(a,-b)
+        for a in range(len(alphas)):
+            for b in range(len(betas)):
+                # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
+                sab[a*len(betas)+b] *= np.exp(-betas[b])
+
+                # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
+                #sab[a*len(betas)+b] *= np.exp(betas[b]*0.5)
+
         return sab
+
+
 
 
 

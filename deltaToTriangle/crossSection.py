@@ -93,7 +93,7 @@ def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec):
 
 if __name__=="__main__":
     plot_Ep_mu = True
-    plot_Ep_Width = False
+    plot_Ep_Width = True
     
     xs_bound = 20.449
     kb = 8.61733e-5
@@ -104,8 +104,8 @@ if __name__=="__main__":
     widths = list(range(2,12,2))
 
     NJOY_LEAPR = False
-    fullRedo = False
     fullRedo = True
+    fullRedo = False
     sabDELTA   = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) \
                   for width in widths]

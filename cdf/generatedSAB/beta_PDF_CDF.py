@@ -132,7 +132,7 @@ def PDF_CDF_at_various_temperatures(A,E,temps,fullBetas):
     plt.show()
 
 
-A = 18.0
+A = 1.0
 E = 1.0 
 PDF_CDF_at_various_temperatures(A,E,temps,fullBetas)
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from math import pi
 from test09_sab import *
 
+
 test9_alphas = alphas[:]
 
 def getSABval(sab,a,b,n_beta):
@@ -34,26 +35,15 @@ for a in range(len(alphas)):
         # We make it asymmetric to make sure it matches eq14
         freeSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
 
-
-        # Assume my sab is symmetric
-        #fullSAB[a*len(fullBetas)+b] = getSABval(sab,a,b_for_positive_betas,len(betas))
-        # We make it asymmetric to make sure it matches eq14
-        #fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
-
-        # Assume my sab is non-symmetric
         fullSAB[a*len(fullBetas)+b] = getSABval(sab,a,b_for_positive_betas,len(betas))
-        fullSAB[a*len(fullBetas)+b] *= np.exp(abs(fullBetas[b])*0.5)
-        if (fullBetas[b] < 0):
+        if (fullBetas[b] > 0):
             fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b])
-        # We make it asymmetric to make sure it matches eq14
-        fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
 
-plt.plot(fullBetas,[getSABval(fullSAB,50,b,len(fullBetas)) for b in range(len(fullBetas))],label='mine')
-plt.plot(fullBetas,[getSABval(freeSAB,50,b,len(fullBetas)) for b in range(len(fullBetas))],label='free')
-plt.legend(loc='best')
-plt.show()
+#plt.plot(fullBetas,[getSABval(fullSAB,50,b,len(fullBetas)) for b in range(len(fullBetas))],label='mine')
+#plt.plot(fullBetas,[getSABval(freeSAB,50,b,len(fullBetas)) for b in range(len(fullBetas))],label='free')
+#plt.legend(loc='best')
+#plt.show()
 
-"""
 def getValidBetasRange(A,E,T,fullBetas):
     kb = 8.6173303e-5
     betaMin = -E/(kb*T)
@@ -98,14 +88,15 @@ def calcBetaPDF(A,E,T,fullBetas,bMin,bMax):
 
     eq14 = [ calcIntegralAcrossAlpha(A,E,T,fullBetas,b) / denominator \
            for b in range(bMin,bMax-1)]
+    print(np.trapz(eq14,x=fullBetas[bMin:bMax-1]))
     return eq14
 
 
 
-def calcBetaCDF(betas,eq14):
+def calcBetaCDF(betas,eq14,bMin):
     eq16 = [0.0]*len(eq14)
     for b in range(1,len(eq14)):
-        eq16[b] = eq16[b-1] + (eq14[b-1]+eq14[b])*0.5*(fullBetas[b]-fullBetas[b-1]) 
+        eq16[b] = eq16[b-1] + (eq14[b-1]+eq14[b])*0.5*(fullBetas[bMin+b]-fullBetas[bMin+b-1]) 
     return eq16
 
 
@@ -116,7 +107,7 @@ def PDF_CDF_at_various_temperatures(A,E,temps,fullBetas):
     for T in temps:
         bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
         eq14 = calcBetaPDF(A,E,T,fullBetas,bMin,bMax)
-        eq16 = calcBetaCDF(fullBetas,eq14)
+        eq16 = calcBetaCDF(fullBetas,eq14,bMin)
         betas_vec.append(fullBetas[bMin:bMax-1])
         eq14_vec.append(eq14)
         eq16_vec.append(eq16)
@@ -131,7 +122,5 @@ def PDF_CDF_at_various_temperatures(A,E,temps,fullBetas):
 A = 18.0
 E = 1.0 
 temps = [300.0,475.0,650.0,825.0,1000.0]   # Water
-temps = [300.0]   # Water
 PDF_CDF_at_various_temperatures(A,E,temps,fullBetas)
 
-"""

@@ -38,10 +38,13 @@ def finishPlotting(colorBar,colorBarName):
     plt.colorbar(colorBar).ax.set_ylabel(colorBarName)
     ax.set_facecolor('xkcd:light grey blue') # off white
     plt.xlabel("E' (eV)")
+    plt.ylabel("XS (b)")
     plt.show()
 
-alphas = [1e-7+ 0.05*i for i in range(500)]
+alphas = [1e-7+ 0.10*i for i in range(100)]
 betas = [0.5*i for i in range(100)]
+alphas = list(np.linspace(1e-7,15,100))
+betas = list(np.linspace(0.0,50,300))
 continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
   .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
@@ -77,9 +80,11 @@ def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec):
                                      sab[(a+1)*len(betas)+b+1],alpha)
 
             sabVal = interpolate(betaL,betaR,sab_betaL,sab_betaR,abs(beta))
-            if (beta < 0): sabVal *= np.exp(abs(beta))
+            if (beta < 0): 
+                sabVal *= np.exp(abs(beta))
 
             xs_vec.append((xs_bound/2*kb*T)*(Ep/E)**0.5*sabVal)
+            #xs_vec.append(sabVal)
         xs_each_mu.append(xs_vec)
     return xs_each_mu
 
@@ -88,9 +93,9 @@ def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec):
 
 if __name__=="__main__":
     plot_Ep_mu = True
-    plot_Ep_Width = True
+    plot_Ep_Width = False
     
-    xs_bound = 20.43634
+    xs_bound = 20.449
     kb = 8.61733e-5
     T = 296.0
     E = 1.0
@@ -98,8 +103,9 @@ if __name__=="__main__":
     Ep_vec = list(np.linspace(0.0,1.5,500))
     widths = list(range(2,12,2))
 
-    NJOY_LEAPR = True
+    NJOY_LEAPR = False
     fullRedo = False
+    fullRedo = True
     sabDELTA   = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) \
                   for width in widths]

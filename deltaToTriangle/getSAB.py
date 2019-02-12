@@ -35,7 +35,7 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
             assert(alphaVals == alphas)
             assert(betaVals == betas)
         # So we actually just collected ssm, which is S_non.sym(a,-b). 
-        # S_non.sym(a,b) = e^b S_non.sym(a,-b)
+        # S_non.sym(a,b) = e^-b S_non.sym(a,-b)
         for a in range(len(alphas)):
             for b in range(len(betas)):
                 # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)

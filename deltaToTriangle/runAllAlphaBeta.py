@@ -114,6 +114,7 @@ if __name__=="__main__":
     fullRedo = True
     #opt0,opt1 = ('mine',None),('mine',2) # Works
     opt0,opt1 = ('njoy',None),('njoy',6) # Works
+    #opt0,opt1 = ('njoy',None),('mine',None) # Works
     #opt0,opt1 = ('mine',None),('njoy',None) # Works
     #opt0,opt1 = ('mine',2),('njoy',2) # Works
     #opt0,opt1 = ('mine',None),('njoy',2) # FAILS, diagonal comparison

@@ -35,17 +35,20 @@ betas = [0.000000, 0.006375, 0.012750, 0.025500, 0.038250, 0.051000, 0.065750,
 alphas = list(np.linspace(0.0001,60,100))
 betas = list(np.linspace(0.0,40,100))
 
+#alphas = list(np.linspace(1,30,3))
+#betas = list(np.linspace(0.0,40,4))
+
+
 n_alpha = len(alphas)
 n_beta = len(betas)
 
 oscE = [ 0.204,    0.4794   ] 
 oscW = [ 0.166667, 0.333333 ]
 
-fullRedo = False
 fullRedo = True
+fullRedo = False
 width = None 
 temps = [296.0,475.0,650.0,825.0,1000.0]   
-sabs = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=True,fullRedo=fullRedo,width=width,oscE=oscE,oscW=oscW) for T in temps]
 
 
 def getSABval(sab,a,b,n_beta):
@@ -63,22 +66,25 @@ def getAlphaMinMax(E,beta,kb,T,A):
     return aMin,aMax
 
 
-fullBetas = [-x for x in betas[1:]][::-1] + betas
 
-#freeSAB = [[0.0]*(2*len(betas)-1)*len(alphas) for t in range(len(temps))]
-fullSAB = [[0.0]*(2*len(betas)-1)*len(alphas) for t in range(len(temps))]
-for t in range(len(temps)):
-    for a in range(len(alphas)):
-        for b in range(len(fullBetas)):
-            b_for_positive_betas = abs(b-len(betas)+1)
-            assert(abs(fullBetas[b]) == betas[b_for_positive_betas])
-            # This creates the symmetric SAB
+def getFullSAB(alphas,betas,temps,fullBetas,sabs): 
+    #freeSAB = [[0.0]*(2*len(betas)-1)*len(alphas) for t in range(len(temps))]
+    fullSAB = [[0.0]*(2*len(betas)-1)*len(alphas) for t in range(len(temps))]
+    for t in range(len(temps)):
+        for a in range(len(alphas)):
+            for b in range(len(fullBetas)):
+                b_for_positive_betas = abs(b-len(betas)+1)
+                assert(abs(fullBetas[b]) == betas[b_for_positive_betas])
+                # This creates the symmetric SAB
+                #freeSAB[t][a*len(fullBetas)+b] = calcSym(alphas[a],fullBetas[b])
+                fullSAB[t][a*len(fullBetas)+b] = getSABval(sabs[t],a,b_for_positive_betas,len(betas))
 
-            #freeSAB[t][a*len(fullBetas)+b] = calcSym(alphas[a],fullBetas[b])
-            fullSAB[t][a*len(fullBetas)+b] = getSABval(sabs[t],a,b_for_positive_betas,len(betas))
-            # We make it asymmetric to make sure it matches eq14
-            #freeSAB[t][a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
-            if (fullBetas[b] < 0): fullSAB[t][a*len(fullBetas)+b] *= np.exp(-fullBetas[b])
+                # We make it asymmetric to make sure it matches eq14
+                #freeSAB[t][a*len(fullBetas)+b] *= np.exp(-fullBetas[b]*0.5)
+                if (fullBetas[b] < 0): fullSAB[t][a*len(fullBetas)+b] *= np.exp(-fullBetas[b])
+    return fullSAB
+
+
 
 def getValidBetasRange(A,E,T,fullBetas):
     kb = 8.6173303e-5
@@ -96,7 +102,7 @@ def getValidBetasRange(A,E,T,fullBetas):
 
 
 
-def calcIntegralAcrossAlpha(A,E,t,fullBetas,b):
+def calcIntegralAcrossAlpha(A,E,t,fullSAB,fullBetas,b):
     kb = 8.6173303e-5
     aMin,aMax = getAlphaMinMax(E,fullBetas[b],kb,temps[t],A)
     denominator = 0.0
@@ -107,19 +113,19 @@ def calcIntegralAcrossAlpha(A,E,t,fullBetas,b):
             denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
     return denominator
 
-def calcBetaPDF(A,E,t,fullBetas,bMin,bMax):
+def calcBetaPDF(A,E,t,fullSAB,fullBetas,bMin,bMax):
 
     denominator = 0.0
     delta0 = fullBetas[bMin+1]-fullBetas[bMin]
     deltaN = fullBetas[bMax-1]-fullBetas[bMax-2]
-    denominator = calcIntegralAcrossAlpha(A,E,t,fullBetas,bMin)*delta0*0.5 +\
-                  calcIntegralAcrossAlpha(A,E,t,fullBetas,bMax-1)*deltaN*0.5
+    denominator = calcIntegralAcrossAlpha(A,E,t,fullSAB,fullBetas,bMin)*delta0*0.5 +\
+                  calcIntegralAcrossAlpha(A,E,t,fullSAB,fullBetas,bMax-1)*deltaN*0.5
     for b in range(bMin+1,bMax-1):
         deltaL = fullBetas[b]-fullBetas[b-1]
         deltaR = fullBetas[b+1]-fullBetas[b]
-        denominator += calcIntegralAcrossAlpha(A,E,t,fullBetas,b) * (deltaL+deltaR) * 0.5
+        denominator += calcIntegralAcrossAlpha(A,E,t,fullSAB,fullBetas,b) * (deltaL+deltaR) * 0.5
 
-    eq14 = [ calcIntegralAcrossAlpha(A,E,t,fullBetas,b) / denominator \
+    eq14 = [ calcIntegralAcrossAlpha(A,E,t,fullSAB,fullBetas,b) / denominator \
            for b in range(bMin,bMax-1)]
     return eq14
 
@@ -132,28 +138,62 @@ def calcBetaCDF(betas,eq14,bMin):
     return eq16
 
 
-def PDF_CDF_at_various_temperatures(A,E,temps,fullBetas):
+def PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas):
     betas_vec = []
     eq14_vec = []
     eq16_vec = []
     for t in range(len(temps)):
         bMin,bMax = getValidBetasRange(A,E,temps[t],fullBetas)
-        eq14 = calcBetaPDF(A,E,t,fullBetas,bMin,bMax)
+        eq14 = calcBetaPDF(A,E,t,fullSAB,fullBetas,bMin,bMax)
         eq16 = calcBetaCDF(fullBetas,eq14,bMin)
         betas_vec.append(fullBetas[bMin:bMax-1])
         eq14_vec.append(eq14)
         eq16_vec.append(eq16)
     for i in range(len(temps)):
-        plt.plot(betas_vec[i],eq14_vec[i],'ro')
-    plt.show()
-    for i in range(len(temps)):
-        plt.plot(betas_vec[i],eq16_vec[i])
+        plt.plot(betas_vec[i],eq14_vec[i])
+    #for i in range(len(temps)):
+    #   plt.plot(betas_vec[i],eq16_vec[i])
     #plt.show()
 
 
 A = 1.0
 E = 1.0 
-PDF_CDF_at_various_temperatures(A,E,temps,fullBetas)
+
+fullBetas = [-x for x in betas[1:]][::-1] + betas
+sabs_NJOY = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=True,fullRedo=fullRedo,width=width,oscE=oscE,oscW=oscW) for T in temps]
+fullSAB = getFullSAB(alphas,betas,temps,fullBetas,sabs_NJOY)
+PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas)
+
+
+#plt.plot(fullBetas,[getSABval(fullSAB[0],0,b,len(fullBetas)) for b in range(len(fullBetas))],'--')
+#plt.plot(fullBetas,[getSABval(fullSAB[0],1,b,len(fullBetas)) for b in range(len(fullBetas))],'--')
+#plt.plot(fullBetas,[getSABval(fullSAB[0],2,b,len(fullBetas)) for b in range(len(fullBetas))],'--')
+
+#plt.plot(betas,[getSABval(sabs_NJOY[0],0,b,len(betas)) for b in range(len(betas))],'--')
+#plt.plot(betas,[getSABval(sabs_NJOY[0],1,b,len(betas)) for b in range(len(betas))],'--')
+#plt.plot(betas,[getSABval(sabs_NJOY[0],2,b,len(betas)) for b in range(len(betas))],'--')
+
+
+
+#print()
+plt.show()
+
+sabs_MINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=False,fullRedo=fullRedo,width=width,oscE=oscE,oscW=oscW) for T in temps]
+fullSAB = getFullSAB(alphas,betas,temps,fullBetas,sabs_MINE)
+PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas)
+
+#plt.plot(fullBetas,[getSABval(fullSAB[0],0,b,len(fullBetas)) for b in range(len(fullBetas))])
+#plt.plot(fullBetas,[getSABval(fullSAB[0],1,b,len(fullBetas)) for b in range(len(fullBetas))])
+#plt.plot(fullBetas,[getSABval(fullSAB[0],2,b,len(fullBetas)) for b in range(len(fullBetas))])
+
+#plt.plot(betas,[getSABval(sabs_MINE[0],0,b,len(betas)) for b in range(len(betas))])
+#plt.plot(betas,[getSABval(sabs_MINE[0],1,b,len(betas)) for b in range(len(betas))])
+#plt.plot(betas,[getSABval(sabs_MINE[0],2,b,len(betas)) for b in range(len(betas))])
+
+
+plt.show()
+
+
 
 
 

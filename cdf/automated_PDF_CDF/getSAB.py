@@ -32,8 +32,8 @@ def getSAB(alphas,betas,T,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
             sab = getLine(f)
             alphaVals = getLine(f)
             betaVals  = getLine(f)
-            assert(alphaVals == alphas)
-            assert(betaVals == betas)
+            assert([abs(alphaVals[i]-alphas[i]) <= 1e-8 for i in range(len(alphas))])
+            assert([abs(betaVals[i]-betas[i]) <= 1e-8 for i in range(len(betas))])
         # So we actually just collected ssm, which is S_non.sym(a,-b). 
         # S_non.sym(a,b) = e^-b S_non.sym(a,-b)
         for a in range(len(alphas)):

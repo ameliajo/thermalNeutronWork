@@ -4,6 +4,37 @@ from math import pi
 from getSAB import *
 
 
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
+
+
+
+def prepPlot(alphas):
+    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+3)
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20c')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
+    #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
+    mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
+            [scalarMap.to_rgba(a) for a in range(len(alphas))])
+    colorBar = plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
+    plt.clf()
+    return scalarMap, colorBar
+
+
+
+def finishPlotting(colorBar,title):
+    ax = plt.gca()
+    plt.colorbar(colorBar).ax.set_ylabel('alpha values')
+    #plt.title(title)
+    #ax.set_facecolor('xkcd:light grey blue') # off white
+    #ax.set_facecolor('xkcd:very light blue') # off white
+    #plt.yscale('log')
+    plt.show()
+
+
+
 
 continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
@@ -13,32 +44,12 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
   .04244, .042, 0.0]
 
-alphas = [.01008, .015, .0252, .033, 0.050406, .0756, 0.100812, 0.151218, 
-  0.201624, 0.252030, 0.302436, 0.352842, 0.403248, 0.453654, 0.504060, 
-  0.554466, 0.609711, 0.670259, 0.736623, 0.809349, 0.889061, 0.976435, 
-  1.072130, 1.177080, 1.292110, 1.418220, 1.556330, 1.707750, 1.873790, 
-  2.055660, 2.255060, 2.473520, 2.712950, 2.975460, 3.263080, 3.578320, 
-  3.923900, 4.302660, 4.717700, 5.172560, 5.671180, 6.217580, 6.816500, 
-  7.472890, 8.192280, 8.980730, 9.844890, 10.79190, 11.83030, 12.96740, 
-  14.21450, 15.58150, 17.07960, 18.72080, 20.52030, 22.49220, 24.65260, 
-  27.02160, 29.61750, 32.46250, 35.58160, 38.99910, 42.74530, 46.85030, 50.0]
-
-betas = [0.000000, 0.006375, 0.012750, 0.025500, 0.038250, 0.051000, 0.065750, 
-  .0806495, 0.120974, 0.161299, 0.241949, 0.322598, 0.403248, 0.483897, 0.564547, 
-  0.645197, 0.725846, 0.806496, 0.887145, 0.967795, 1.048440, 1.129090, 1.209740, 
-  1.290390, 1.371040, 1.451690, 1.532340, 1.612990, 1.693640, 1.774290, 1.854940, 
-  1.935590, 2.016240, 2.096890, 2.177540, 2.258190, 2.338840, 2.419490, 2.500140, 
-  2.580790, 2.669500, 2.767090, 2.874450, 2.992500, 3.122350, 3.265300, 3.422470, 
-  3.595360, 3.785490, 3.994670, 4.224730, 4.477870, 4.756310, 5.062580, 5.399390, 
-  5.769970, 6.177660, 6.626070, 7.119240, 7.661810, 8.258620, 8.915110, 9.637220, 10.0,
-  10.43200, 11.30510, 12.26680, 13.32430, 14.48670, 15.76600, 17.17330, 18.72180, 
-  20.42450, 22.29760, 24.35720, 25.0]
-
 alphas = list(np.linspace(0.01,60,500))
 betas = list(np.linspace(0.0,40,100))
 
 n_alpha = len(alphas)
 n_beta = len(betas)
+
 
 oscE = [ 0.204,    0.4794   ] 
 oscW = [ 0.166667, 0.333333 ]
@@ -48,8 +59,8 @@ fullRedo = True
 runNJOY = False
 width = None 
 temps = [296.0,475.0,650.0,825.0,1000.0]   # Water
+temps = list(np.linspace(296,1000,20))
 
-#sabs = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=fullRedo,width=width,oscE=oscE,oscW=oscW) for T in temps]
 
 def getSABval(sab,a,b,n_beta):
     return sab[a*n_beta+b]
@@ -99,17 +110,7 @@ def PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabs):
         eq16 = calcAlphaCDF(eq15,alphas)
         eq16_vecs.append(eq16)
 
-    for i in range(len(temps)): plt.plot(alpha_vecs[i],eq15_vecs[i],label=str(temps[i])+' K')
-    plt.legend(loc='best')
-    plt.xlabel('alpha')
-    plt.ylabel('PDF')
-    plt.show()
-
-    for i in range(len(temps)): plt.plot(alpha_vecs[i],eq16_vecs[i],label=str(temps[i])+' K')
-    plt.legend(loc='best')
-    plt.xlabel('alpha')
-    plt.ylabel('CDF')
-    plt.show()
+    return alpha_vecs,eq15_vecs,eq16_vecs
 
 
 
@@ -126,13 +127,34 @@ print("BETA",beta)
 fullRedo = True
 fullRedo = False
 
-sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
-            width=width,oscE=oscE,oscW=oscW) for T in temps]
-PDF_CDF_at_various_temps(A=A,E=E,temps=temps,beta=beta,alphas=alphas,n_beta=n_beta,index=index,sabs=sabsMINE)
-#sabsNJOY = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=True,fullRedo=fullRedo,\
+#sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
 #            width=width,oscE=oscE,oscW=oscW) for T in temps]
-#PDF_CDF_at_various_temps(A=A,E=E,temps=temps,beta=beta,alphas=alphas,n_beta=n_beta,index=index,sabs=sabsNJOY)
-#plt.show()
+sabsNJOY = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=True,fullRedo=fullRedo,\
+            width=width,oscE=oscE,oscW=oscW) for T in temps]
+
+
+
+alpha_vecs, alphaPDFs, alphaCDFs = PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabsNJOY)
+b_index = index
+
+alphaValsToAimFor = list(np.linspace(5,35,20))
+scalarMap, colorBar = prepPlot(alphaValsToAimFor)
+for a,alphaValToAimFor in enumerate(alphaValsToAimFor):
+    cdfVals = []
+    for t in range(len(temps)):
+        aPrime = 0
+        for i in range(len(alpha_vecs[t])-1):
+            if alpha_vecs[t][i] <= alphaValToAimFor <= alpha_vecs[t][i+1]: aPrime = i
+        #pdfVals.append(alphaPDFs[t][aPrime])
+        cdfVals.append(alphaCDFs[t][aPrime])
+    plt.plot(temps,cdfVals,color=scalarMap.to_rgba(a))
+    plt.plot(temps,cdfVals,'x',markersize=2,color=scalarMap.to_rgba(a))
+
+plt.xlabel("Temperature (K)")
+plt.ylabel("CDF")
+finishPlotting(colorBar,"")
+
+
 
 
 

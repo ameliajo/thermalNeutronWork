@@ -11,6 +11,34 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
   .04244, .042, 0.0]
 
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
+
+
+
+def prepPlot(alphas):
+    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+3)
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
+    #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
+    mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
+            [scalarMap.to_rgba(a) for a in range(len(alphas))])
+    colorBar = plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
+    plt.clf()
+    return scalarMap, colorBar
+
+
+
+def finishPlotting(colorBar,title):
+    ax = plt.gca()
+    plt.colorbar(colorBar).ax.set_ylabel('beta values')
+    #plt.title(title)
+    #ax.set_facecolor('xkcd:light grey blue') # off white
+    #plt.yscale('log')
+    plt.show()
+
+
+
 #alphas = [.01008, .015, .0252, .033, 0.050406, .0756, 0.100812, 0.151218, 
 #  0.201624, 0.252030, 0.302436, 0.352842, 0.403248, 0.453654, 0.504060, 
 #  0.554466, 0.609711, 0.670259, 0.736623, 0.809349, 0.889061, 0.976435, 
@@ -54,6 +82,7 @@ width = None
 temps = [296.0]   
 temps = [296.0,475.0,650.0,825.0,1000.0]   
 
+temps = list(np.linspace(296,1000,20))
 
 def getSABval(sab,a,b,n_beta):
     return sab[a*n_beta+b]
@@ -153,32 +182,42 @@ def PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas):
         betas_vec.append(fullBetas[bMin:bMax-1])
         eq14_vec.append(eq14)
         eq16_vec.append(eq16)
-    for i in range(len(temps)):
-        plt.plot(betas_vec[i],eq14_vec[i],label=str(temps[i])+' K')
-    plt.legend(loc='best')
-    plt.xlabel('beta')
-    plt.ylabel('PDF')
-    plt.show()
-    for i in range(len(temps)):
-       plt.plot(betas_vec[i],eq16_vec[i],label=str(temps[i])+' K')
-    plt.legend(loc='best')
-    plt.xlabel('beta')
-    plt.ylabel('CDF')
-    plt.show()
+    return betas_vec,eq16_vec
 
 
 A = 1.0
 E = 1.0 
 
 fullBetas = [-x for x in betas[1:]][::-1] + betas
-#sabs_NJOY = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=True,fullRedo=fullRedo,width=width,oscE=oscE,oscW=oscW) for T in temps]
-#fullSAB = getFullSAB(alphas,betas,temps,fullBetas,sabs_NJOY)
+sabs_NJOY = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=True,fullRedo=fullRedo,width=width,oscE=oscE,oscW=oscW) for T in temps]
+fullSAB = getFullSAB(alphas,betas,temps,fullBetas,sabs_NJOY)
+beta_vecs,cdf = PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas)
+
+betasToLookFor = list(np.linspace(-40,18,20))
+scalarMap, colorBar = prepPlot(betasToLookFor)
+for b,betaToLookFor in enumerate(betasToLookFor):
+    tempVals = []
+    cdfVals = []
+    for t in range(len(temps)):
+        bPrime = None 
+        for i in range(len(beta_vecs[t])-1):
+            if beta_vecs[t][i] <= betaToLookFor <= beta_vecs[t][i+1]: bPrime = i
+        if bPrime != None:
+            tempVals.append(temps[t])
+            cdfVals.append(cdf[t][bPrime])
+    plt.plot(tempVals,cdfVals,color=scalarMap.to_rgba(b))
+    plt.plot(tempVals,cdfVals,'x',markersize=2,color=scalarMap.to_rgba(b))
+
+
+
+plt.xlabel("Temperature (K)")
+plt.ylabel("CDF")
+finishPlotting(colorBar,"")
+
+
+#sabs_MINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=False,fullRedo=False,width=width,oscE=oscE,oscW=oscW) for T in temps]
+#fullSAB = getFullSAB(alphas,betas,temps,fullBetas,sabs_MINE)
 #PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas)
 #plt.show()
-
-sabs_MINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=False,fullRedo=False,width=width,oscE=oscE,oscW=oscW) for T in temps]
-fullSAB = getFullSAB(alphas,betas,temps,fullBetas,sabs_MINE)
-PDF_CDF_at_various_temperatures(A,E,temps,fullSAB,fullBetas)
-plt.show()
 
 

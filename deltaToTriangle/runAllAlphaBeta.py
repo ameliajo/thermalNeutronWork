@@ -8,8 +8,8 @@ import matplotlib.cm as cmx
 
 def prepPlot():
     cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+3)
-    #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
-    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
+    #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
     mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
             [scalarMap.to_rgba(a) for a in range(len(alphas))])
     colorBar = plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
@@ -113,8 +113,8 @@ if __name__=="__main__":
     fullRedo = False
     fullRedo = True
     #opt0,opt1 = ('mine',None),('mine',2) # Works
-    opt0,opt1 = ('njoy',None),('njoy',6) # Works
-    #opt0,opt1 = ('njoy',None),('mine',None) # Works
+    #opt0,opt1 = ('njoy',None),('njoy',6) # Works
+    opt0,opt1 = ('njoy',None),('mine',None) # Works
     #opt0,opt1 = ('mine',None),('njoy',None) # Works
     #opt0,opt1 = ('mine',2),('njoy',2) # Works
     #opt0,opt1 = ('mine',None),('njoy',2) # FAILS, diagonal comparison

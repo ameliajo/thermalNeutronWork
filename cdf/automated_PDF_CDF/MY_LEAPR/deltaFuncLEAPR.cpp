@@ -3,8 +3,14 @@
 #include <sstream>
 #include <vector>
 #include <string>
+//#include "leaprCode/contin/contin.h"
+//#include "leaprCode/discre/discre.h"
 #include "/Users/amelia/Dropbox (MIT)/Senior Fall/Masters/LEAPR/leapr/src/contin/contin.h"
 #include "/Users/amelia/Dropbox (MIT)/Senior Fall/Masters/LEAPR/leapr/src/discre/discre.h"
+//#include "/Users/amelia/IAP_2018_leapr/leapr/src/contin/contin.h"
+//#include "/Users/amelia/IAP_2018_leapr/leapr/src/discre/discre.h"
+
+
 
 
 
@@ -12,8 +18,9 @@ template <typename A>
 auto runLEAPR( const A& alpha, const A& beta, const double& T,const A& rho, int nd, 
   A oscE = A(), A oscW = A() ){
 
-  int ntempr, iprint, nphon, mat, npr, iel, ncold, nss, nalpha, nbeta, 
-      lat, ni, nka, mss;
+
+  int ntempr, iprint, nphon, mat, npr, iel, ncold, nss,  
+      lat, nka, mss;
   double za, awr, spr, aws, sps, delta, twt, c, tbeta, dka, b7;
   std::vector<double> temp_vec,kappa;
 
@@ -42,11 +49,11 @@ auto runLEAPR( const A& alpha, const A& beta, const double& T,const A& rho, int 
   ntempr = 1;       iprint = 1;      nphon = 100;                       // Card 3
   mat    = 101;     za     = 1001.0;                                    // Card 4
   awr    = 0.99917; spr    = 20.449; npr   = 2;   iel = 0;   ncold = 0; // Card 5
-  nss    = 1;       b7     = 1.;     aws   = 1.1; sps = 3.8883; mss = 1; 
+  nss    = 1;       b7     = 1.;     aws   = 15.85316; sps = 3.8883; mss = 1; 
                                                                         // Card 6
-  nalpha = 5;       nbeta  = 7;      lat   = 0;                         // Card 7
+      lat   = 0;                         // Card 7
   temp_vec   = { T };                                               // Card 10 
-  delta  = 0.00255;     ni     = 67;                                    // Card 11
+  delta  = 0.00255;                                        // Card 11
                                                                         // Card 12
   twt    = 0.0;     c      = 0.0;    tbeta = 0.5;             // Card 13
   //nd     = 2;                                                           // Card 14
@@ -55,14 +62,17 @@ auto runLEAPR( const A& alpha, const A& beta, const double& T,const A& rho, int 
   nka    = 4;       dka    = 0.01;                                      // Card 17
   kappa  = { 0.1, 0.2, 0.4, 0.7 };                                      // Card 18
 
+  std::vector<double> energyGrid(rho.size());
+  for (size_t i = 0; i < energyGrid.size(); ++i ){
+    energyGrid[i] = i*delta;
+  }
 
 
   // If we are running a case with no delta functions, then we want to make sure
   // that our continuous piece integrates to 1
-  if (nd == 0){ tbeta = 1.0; }
+ 
 
-
-  std::cout << "\n  tbeta " << tbeta;
+  std::cout << "\n\n  tbeta " << tbeta;
   std::cout << "\n\n" << std::endl;
 
 
@@ -94,9 +104,17 @@ auto runLEAPR( const A& alpha, const A& beta, const double& T,const A& rho, int 
 
 
 
+
   std::vector<double> t_eff_vec ( temp_vec.size(), 0.0 );
   auto lambda_s_t_eff = contin( itemp, nphon, delta, tbeta, scaling, tev,
-                                sc, rho, alpha, beta, sym_sab );
+                                sc, rho, alpha, beta, sym_sab,energyGrid);
+  std::cout << "SAB coming out of contin" << std::endl;
+  std::cout << sym_sab[0][0][0] << std::endl;
+  std::cout << sym_sab[1][1][0] << std::endl;
+  std::cout << sym_sab[2][2][0] << std::endl;
+  std::cout << std::endl;
+
+
   double lambda_s = std::get<0>(lambda_s_t_eff);
   t_eff_vec[itemp] = std::get<1>(lambda_s_t_eff) * temp;
 
@@ -104,7 +122,6 @@ auto runLEAPR( const A& alpha, const A& beta, const double& T,const A& rho, int 
     discre( itemp, sc, scaling, tev, lambda_s, twt, tbeta, alpha,
     beta, temp_vec, oscE, oscW, t_eff_vec, sym_sab );
   }
-
 
   return sym_sab;
 }

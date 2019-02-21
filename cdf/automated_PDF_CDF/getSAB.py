@@ -39,6 +39,7 @@ def getSAB(alphas,betas,T,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
         for a in range(len(alphas)):
             for b in range(len(betas)):
                 # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
+                break
                 sab[a*len(betas)+b] *= np.exp(-betas[b])
 
                 # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
@@ -76,6 +77,7 @@ def getSAB(alphas,betas,T,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
         for a in range(len(alphas)):
             for b in range(len(betas)):
                 # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
+                break
                 sab[a*len(betas)+b] *= np.exp(-betas[b])
 
                 # This is to go from S_non.sym(a,b)  --> S_sym(a,b)

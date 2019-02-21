@@ -92,11 +92,11 @@ def calcAlphaCDF(eq15,alphas):
 def PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabs):
     alpha_vecs, eq15_vecs, eq16_vecs = [], [], []
     for t in range(len(temps)):
-        alphas = getAlphaRange(E,beta,temps[t],A,alphas)
-        eq15 = calcAlphaPDF(A=A,E=E,t=t,beta=beta,alphas=alphas,n_beta=n_beta,index=index,sabs=sabs)
-        alpha_vecs.append(alphas)
+        theseAlphas = getAlphaRange(E,beta,temps[t],A,alphas)
+        eq15 = calcAlphaPDF(A,E,t,beta,theseAlphas,n_beta,index,sabs)
+        alpha_vecs.append(theseAlphas)
         eq15_vecs.append(eq15)
-        eq16 = calcAlphaCDF(eq15,alphas)
+        eq16 = calcAlphaCDF(eq15,theseAlphas)
         eq16_vecs.append(eq16)
 
     for i in range(len(temps)): plt.plot(alpha_vecs[i],eq15_vecs[i],label=str(temps[i])+' K')

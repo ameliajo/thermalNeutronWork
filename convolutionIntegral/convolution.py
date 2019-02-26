@@ -1,7 +1,28 @@
 from numpy import exp
 import numpy as np
 import matplotlib.pyplot as plt
+from plot import *
 
+
+# Lets assume an alpha = 0.05 and a lambda = 1.2
+alpha = 0.50
+lambda_s = 2.308
+continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
+  .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
+  .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
+  .09126, .0871, .0839, .0807, .07798, .07574, .0735, .07162, .06974, .06804,  \
+  .06652, .065, .0634, .0618, .06022, .05866, .0571, .05586, .05462, .0535,    \
+  .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
+  .04244, .042, 0.0]
+
+inputBetas = np.arange(0,0.00255*len(continRho),0.00255)
+P = [continRho[b]/(2*inputBetas[b]*np.sinh(inputBetas[b]*0.5)) for b in range(1,len(inputBetas))]
+P = [continRho[1]/inputBetas[1]**2] + P
+inputT1 = [P[b]*exp(-inputBetas[b]*0.5)/lambda_s for b in range(len(inputBetas))] 
+#plt.plot(inputBetas,continRho)
+#plt.plot(inputBetas,P)
+#plt.plot(inputBetas,T1)
+#plt.show()
 
 
 def interpolate(xList,yList,x):
@@ -13,17 +34,10 @@ def interpolate(xList,yList,x):
     return 0.0 if (xList[-1] < x) or xList[0] > x else yList[-1]
 
 def getVal(betaGrid,Tn,b):
-    if abs(b) >= len(betaGrid):
-        return 0.0
-    if b < 0:
-        return Tn[abs(b)]*exp(betaGrid[abs(b)])
+    if abs(b) >= len(betaGrid): return 0.0
+    if b < 0: return Tn[abs(b)]*exp(betaGrid[abs(b)])
     return Tn[b]
 
-
-
-inputBetas = list(np.linspace(0.0,4,10)) + list(np.linspace(1.0,3,25))
-inputBetas.sort()
-inputT1 = [-2*x*x+8*x for x in inputBetas]
 
 def convolve(beta,T1,Tlast):
     Tn = [0.0]*N
@@ -42,27 +56,32 @@ def convolve(beta,T1,Tlast):
     return Tn
 
 
-# Lets assume an alpha = 0.05 and a lambda = 1.2
-beta = np.linspace(0,10,21) 
+numIter = 50
+scalarMap, colorBar = prepPlot(list(range(numIter)))
+beta = np.linspace(0,10,50) 
 N = len(beta)
 T1 = [interpolate(inputBetas,inputT1,abs(beta[i])) for i in range(N)]
 Tn = T1[:]
 S = [0.0]*N
-S[0] = exp(-0.05*1.2)
-for n in range(1,15):
-    alpha_n_term = (exp(-0.05*1.2)*(0.05*1.2)**n)*(1.0/np.math.factorial(n))
+S[0] = exp(-alpha*lambda_s)
+diffs = []
+for n in range(1,numIter):
+    alpha_n_term = (exp(-alpha*lambda_s)*(alpha*lambda_s)**n) * \
+                   (1.0/np.math.factorial(n))
+    totalDiff = 0.0
     for b in range(N):
-        S[b] = alpha_n_term * Tn[b]
+        S[b] += alpha_n_term * Tn[b]
+        totalDiff += alpha_n_term * Tn[b] * 0.0001
+    diffs.append(totalDiff)
     Tn = convolve(beta,T1,Tn)
-    plt.plot(beta,S)
-
-
+    #plt.plot(beta,S,color=scalarMap.to_rgba(n))
+    if totalDiff < 1e-6:
+        break
+plt.plot(diffs)
 plt.show()
 
-
-
-
-
+#finishPlotting(colorBar)
+#plt.plot(diffs,'bo')
 
 
 

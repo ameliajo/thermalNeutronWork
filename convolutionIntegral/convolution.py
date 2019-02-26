@@ -12,97 +12,55 @@ def interpolate(xList,yList,x):
             return m*x+b
     return 0.0 if (xList[-1] < x) or xList[0] > x else yList[-1]
 
+def getVal(betaGrid,Tn,b):
+    if abs(b) >= len(betaGrid):
+        return 0.0
+    if b < 0:
+        return Tn[abs(b)]*exp(betaGrid[abs(b)])
+    return Tn[b]
+
+
 
 inputBetas = list(np.linspace(0.0,4,10)) + list(np.linspace(1.0,3,25))
 inputBetas.sort()
 inputT1 = [-2*x*x+8*x for x in inputBetas]
 
+def convolve(beta,T1,Tlast):
+    Tn = [0.0]*N
+    for b in range(N):
+        for bp in range(N-1):
+            AL = T1[bp]*exp(beta[bp])
+            AR = T1[bp+1]*exp(beta[bp+1])
+            BL = getVal(beta,Tlast,b+bp)
+            BR = getVal(beta,Tlast,b+bp+1)
+            CL = T1[bp]
+            CR = T1[bp+1]
+            DL = getVal(beta,Tlast,b-bp)
+            DR = getVal(beta,Tlast,b-bp-1)
+            Tn[b] += ((AL*BL+CL*DL) + (AR*BR+CR*DR)) * \
+                     (beta[bp+1]-beta[bp]) * 0.5
+    return Tn
 
 
-# REFLECT BETA AND T1
-reflectT1 = [interpolate(inputBetas,inputT1,abs(beta)) for beta in reflectBetas]
-reflectBetas = np.linspace(-10,10,21) #reflectBetas = np.linspace(-2,8,11)
-plt.plot(inputBetas,inputT1,'r')
-plt.plot(inputBetas,inputT1,'ro',markersize=5)
-plt.plot(reflectBetas,reflectT1,'b')
-plt.plot(reflectBetas,reflectT1,'bo',markersize=1)
-
-for i in range(int(len(reflectBetas)/2)+1):
-    reflectT1[i] *= exp(-reflectBetas[i])
-
-plt.plot(reflectBetas,reflectT1,'g')
-plt.plot(reflectBetas,reflectT1,'go',markersize=2)
-plt.show()
-"""
-"""
-
-#betas = np.linspace(0,10,21)
-betas = [x for x in reflectBetas if x >= 0]
-T1 = [interpolate(inputBetas,inputT1,beta) for beta in betas]
-
-T2 = [0.0]*len(betas)
-
-for b in range(len(betas)):
-    beta = betas[b]
-    for b_prime in range(len(reflectBetas[:-1])):
-        betaPrime = reflectBetas[b_prime]
-        L = interpolate(betas,T1,abs(betaPrime)) * \
-            interpolate(betas,T1,abs(beta-reflectBetas[b_prime]))
-        R = interpolate(betas,T1,abs(reflectBetas[b_prime+1])) * \
-            interpolate(betas,T1,abs(beta-reflectBetas[b_prime+1]))
-        if      reflectBetas[b_prime]   < 0: L*= exp(-reflectBetas[b_prime])
-        if beta-reflectBetas[b_prime]   < 0: L*= exp(-beta+reflectBetas[b_prime])
-        if      reflectBetas[b_prime+1] < 0: R*= exp(-reflectBetas[b_prime+1])
-        if beta-reflectBetas[b_prime+1] < 0: R*= exp(-beta+reflectBetas[b_prime+1])
-
-        T2[b] += (L+R)*(reflectBetas[b_prime+1]-reflectBetas[b_prime])*0.5
-
-plt.plot(betas,T2,'k')
-plt.plot(betas,T2,'ko')
-#plt.show()
-
-
-
-
-"""
-
-
-
-
-
+# Lets assume an alpha = 0.05 and a lambda = 1.2
+beta = np.linspace(0,10,21) 
+N = len(beta)
+T1 = [interpolate(inputBetas,inputT1,abs(beta[i])) for i in range(N)]
+Tn = T1[:]
+S = [0.0]*N
+S[0] = exp(-0.05*1.2)
+for n in range(1,15):
+    alpha_n_term = (exp(-0.05*1.2)*(0.05*1.2)**n)*(1.0/np.math.factorial(n))
+    for b in range(N):
+        S[b] = alpha_n_term * Tn[b]
+    Tn = convolve(beta,T1,Tn)
+    plt.plot(beta,S)
 
 
 plt.show()
 
 
 
-#move T1 to ultrafine grid
-T1 = [0.0]*len(reflectBetas)
-for b,beta in enumerate(reflectBetas):
-    T1[b] = interpolate(inputBetas,inputT1,beta)
-
-plt.plot(inputBetas,inputT1,'r')
-plt.plot(inputBetas,inputT1,'ro',markersize=5)
-plt.plot(reflectBetas,T1,'b')
-plt.plot(reflectBetas,T1,'bo',markersize=1)
-
-
-T2 = [0.0]*len(reflectBetas)
-
-for b,beta in enumerate(reflectBetas):
-    for b_prime,beta_prime in enumerate(reflectBetas[:-1]):
-        L = interpolate(reflectBetas,T1,reflectBetas[b_prime]) * \
-            interpolate(reflectBetas,T1,beta-reflectBetas[b_prime])
-        R = interpolate(reflectBetas,T1,reflectBetas[b_prime+1]) * \
-            interpolate(reflectBetas,T1,beta-reflectBetas[b_prime+1])
-
-        print(beta,beta_prime,L,R)
-        T2[b] += (L+R)*(reflectBetas[b_prime+1]-reflectBetas[b_prime])*0.5
-
-plt.plot(reflectBetas,T2,'g')
-plt.plot(reflectBetas,T2,'go',markersize=1)
-plt.show()
-"""
 
 
 
@@ -111,8 +69,16 @@ plt.show()
 
 
 
-#betas = [-2.0, 0.0, 2.0]
-#T1 = [3.0*exp(2),1.0,3.0]
+
+
+
+
+
+
+
+
+
+
 
 
 

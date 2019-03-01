@@ -24,7 +24,7 @@ def finishPlotting(colorBar):
     plt.colorbar(colorBar).ax.set_ylabel('iteration')
     #ax.set_facecolor('xkcd:light grey blue') # off white
     #ax.set_facecolor('xkcd:very light blue') # off white
-    plt.yscale('log')
+    #plt.yscale('log')
     plt.show()
 
 

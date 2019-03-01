@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 from plot import *
 
 
-# Lets assume an alpha = 0.05 and a lambda = 1.2
+# Lets assume an alpha value
 alpha = 0.50
-lambda_s = 2.308
 continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
   .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
@@ -15,13 +14,20 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
   .04244, .042, 0.0]
 
-inputBetas = np.arange(0,0.00255*len(continRho),0.00255)
-P = [continRho[b]/(2*inputBetas[b]*np.sinh(inputBetas[b]*0.5)) for b in range(1,len(inputBetas))]
-P = [continRho[1]/inputBetas[1]**2] + P
-inputT1 = [P[b]*exp(-inputBetas[b]*0.5)/lambda_s for b in range(len(inputBetas))] 
-#plt.plot(inputBetas,continRho)
-#plt.plot(inputBetas,P)
-#plt.plot(inputBetas,T1)
+rhoBeta = np.arange(0,0.00255*len(continRho),0.00255)
+P = [continRho[b]/(2*rhoBeta[b]*np.sinh(rhoBeta[b]*0.5)) for b in range(1,len(rhoBeta))]
+P = [continRho[1]/rhoBeta[1]**2] + P
+
+lambda_s = P[0] *2.0*np.cosh(rhoBeta[0 ]*0.5)*0.5*(rhoBeta[1] -rhoBeta[0] ) + \
+           P[-1]*2.0*np.cosh(rhoBeta[-1]*0.5)*0.5*(rhoBeta[-1]-rhoBeta[-2])
+for b in range(1,len(rhoBeta)-1):
+    lambda_s += P[b]*2.0*np.cosh(rhoBeta[b]*0.5)*(rhoBeta[b]-rhoBeta[b-1])
+
+inputT1 = [P[b]*exp(-rhoBeta[b]*0.5)/lambda_s for b in range(len(rhoBeta))] 
+
+#plt.plot(rhoBeta,continRho)
+#plt.plot(rhoBeta,P)
+#plt.plot(rhoBeta,T1)
 #plt.show()
 
 
@@ -56,11 +62,11 @@ def convolve(beta,T1,Tlast):
     return Tn
 
 
-numIter = 50
+numIter = 10
 scalarMap, colorBar = prepPlot(list(range(numIter)))
-beta = np.linspace(0,10,50) 
+beta = np.linspace(0,3,300) 
 N = len(beta)
-T1 = [interpolate(inputBetas,inputT1,abs(beta[i])) for i in range(N)]
+T1 = [interpolate(rhoBeta,inputT1,abs(beta[i])) for i in range(N)]
 Tn = T1[:]
 S = [0.0]*N
 S[0] = exp(-alpha*lambda_s)
@@ -74,17 +80,12 @@ for n in range(1,numIter):
         totalDiff += alpha_n_term * Tn[b] * 0.0001
     diffs.append(totalDiff)
     Tn = convolve(beta,T1,Tn)
-    #plt.plot(beta,S,color=scalarMap.to_rgba(n))
+    plt.plot(beta,S,color=scalarMap.to_rgba(n))
     if totalDiff < 1e-6:
         break
-plt.plot(diffs)
-plt.show()
-
-#finishPlotting(colorBar)
-#plt.plot(diffs,'bo')
-
-
-
+finishPlotting(colorBar)
+#plt.plot(diffs)
+#plt.show()
 
 
 

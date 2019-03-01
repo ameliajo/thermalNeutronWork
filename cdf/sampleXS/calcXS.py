@@ -3,10 +3,43 @@ import matplotlib.pyplot as plt
 from math import pi
 from getSAB import *
 from rho import continRho,oscE,oscW
-from random import random
+import random
 
-def getSABval(sab,a,b,n_beta):
-    return sab[a*n_beta+b]
+import matplotlib.colors as colors
+import matplotlib.cm as cmx
+
+
+
+def prepPlot(alphas):
+    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+2)
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20c')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
+    #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
+    mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
+            [scalarMap.to_rgba(a) for a in range(len(alphas))])
+    colorBar = plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
+    plt.clf()
+    return scalarMap, colorBar
+
+
+
+def finishPlotting(colorBar,title):
+    ax = plt.gca()
+    plt.colorbar(colorBar).ax.set_ylabel('energies')
+    #plt.title(title)
+    #ax.set_facecolor('xkcd:light grey blue') # off white
+    #ax.set_facecolor('xkcd:very light blue') # off white
+    #plt.yscale('log')
+    plt.show()
+
+
+
+
+
+def getSABval(sab,a,b,nBeta):
+    return sab[a*nBeta+b]
 
 
 def getFullSAB(alphas,betas,fullBetas,sabs): 
@@ -97,14 +130,40 @@ def PDF_CDF_at_various_temperatures(A,E,T,fullSAB,fullBetas):
     return fullBetas[bMin:bMax-1],eq16
 
 
+def sampleCDF(x,CDF):
+    xsi = random.random()
+    for i in range(len(x)-1):
+        if CDF[i] <= xsi < CDF[i+1]:
+            frac  = (xsi-CDF[i])/(CDF[i+1]-CDF[i])
+            val = frac*(CDF[i+1]-CDF[i])+x[i]
+            return i,val
 
 
-E, A, T = 1.0, 1.0, 296.0
+
+def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas):
+    denominator = 0.0
+    for a in range(nAlpha-1):
+        sabL = getSABval(fullSAB,a,index,nFullBetas)
+        sabR = getSABval(fullSAB,a+1,index,nFullBetas)
+        denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
+
+    alphaPDF = [getSABval(fullSAB,a,index,nFullBetas)/denominator \
+                for a in range(nAlpha)]
+    alphaCDF = [0.0]*nAlpha
+    for a in range(1,nAlpha):
+        alphaCDF[a] = alphaCDF[a-1]+(alphaPDF[a]+alphaPDF[a-1]) * \
+                      0.5*(alphas[a]-alphas[a-1])
+    return alphaCDF
+
+
+
+
+A, T = 1.0, 296.0
 kb = 8.6173303e-5
 
-n_alpha, n_beta = 500, 100
-alphas = list(np.linspace(0.01,60,n_alpha))
-betas  = list(np.linspace(0.00,40,n_beta))
+nAlpha, nBeta = 500, 100
+alphas = list(np.linspace(0.01,60,nAlpha))
+betas  = list(np.linspace(0.00,40,nBeta))
 
 useNJOY  = True
 fullRedo = False
@@ -115,60 +174,35 @@ fullBetas = [-x for x in betas[1:]][::-1] + betas
 SAB = getSAB(alphas,betas,T,continRho,useNJOY,fullRedo,width,oscE,oscW) 
 fullSAB = getFullSAB(alphas,betas,fullBetas,SAB)
 
-relevantBetas, betaCDF = PDF_CDF_at_various_temperatures(A,E,T,fullSAB,fullBetas)
-
-N = 1000
-for n in range(N):
-    xsi_1 = random()
-    index = 0
-    beta = 0.0
-    for i in range(len(relevantBetas)-1):
-        if betaCDF[i] <= xsi_1 < betaCDF[i+1]:
-            index = i
-            frac  = (xsi_1-betaCDF[i])/(betaCDF[i+1]-betaCDF[i])
-            beta = frac*(betaCDF[i+1]-betaCDF[i])+relevantBetas[i]
-            break
+N = 500
 
 
-    denominator = 0.0
-    for a in range(len(alphas)-1):
-        sabL = getSABval(fullSAB,a,index,len(fullBetas))
-        sabR = getSABval(fullSAB,a+1,index,len(fullBetas))
-        denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
-    alphaPDF = [getSABval(fullSAB,a,index,len(fullBetas))/denominator \
-                for a in range(len(alphas))]
+Energies = [0.01,0.1,0.5,1.0,5.0,6.0,8.0,10.0,12.0]
+scalarMap, colorBar = prepPlot(Energies)
+for i,E in enumerate(Energies):
+    print(E)
+
+    relevantBetas, betaCDF = PDF_CDF_at_various_temperatures(A,E,T,fullSAB,fullBetas)
+
+    for n in range(N):
     
-    alphaCDF = [0.0]*len(alphaPDF)
-    for a in range(1,len(alphaPDF)):
-        alphaCDF[a] = alphaCDF[a-1]+(alphaPDF[a]+alphaPDF[a-1]) * \
-                      0.5*(alphas[a]-alphas[a-1])
-
-    aMin_index, aMax_index = getAlphaMinMaxIndices(E,beta,kb,T,A,alphas)
-    alphasToPlot, H = [], []
-    for a in range(aMin_index,aMax_index+1):
-        alphasToPlot.append(alphas[a])
-        H.append( (alphaCDF[a]-alphaCDF[aMin_index]) / \
-                  (alphaCDF[aMax_index]-alphaCDF[aMin_index]) )
+        index,beta = sampleCDF(relevantBetas,betaCDF)
     
+        alphaCDF = getAlphaCDF(nAlpha,len(fullBetas),index,fullSAB,alphas)
+    
+        aMin, aMax = getAlphaMinMaxIndices(E,beta,kb,T,A,alphas)
 
-    xsi_2 = random()
-    alpha = 0.0
-    for i in range(len(alphasToPlot)-1):
-        if alphas[i] >= alphasToPlot[0] and alphas[i] <= alphasToPlot[-1]:
-            if H[i] <= xsi_2 < H[i+1]:
-                frac  = (xsi_2-H[i])/(H[i+1]-H[i])
-                alpha = frac*(H[i+1]-H[i])+alphasToPlot[i]
-                break
+        H = [None]*nAlpha
+        for a in range(nAlpha):
+            if   (alphas[a] < alphas[aMin]): H[a] = 0
+            elif (alphas[a] > alphas[aMax]): H[a] = 1
+            else:
+                H[a] = ( (alphaCDF[a]-alphaCDF[aMin]) / \
+                         (alphaCDF[aMax]-alphaCDF[aMin]) )
+    
+        index,alpha = sampleCDF(alphas,H)
 
-
-
-    plt.plot(alpha,beta,'ro')
-
-
-
-
-
-
+        plt.plot(alpha,beta,marker='o',markersize=1,c=scalarMap.to_rgba(i))
 
 
 
@@ -177,7 +211,7 @@ for n in range(N):
 #plt.plot(relevantBetas,betaCDF)
 plt.xlabel('alpha')
 plt.ylabel('beta')
-plt.show()
+finishPlotting(colorBar,"")
 
 
 

@@ -66,32 +66,26 @@ def convolve(beta,T1,Tlast,numBeta):
 #    Tn = T1[:]
 #    S = [exp(-alpha*lambda_s)] + [0.0]*(len(beta)-1)
 #    for n in range(1,numIter):
-#        alpha_n_term = (exp(-alpha*lambda_s)*(alpha)**n) * \
+#        aTerms = (exp(-alpha*lambda_s)*(alpha)**n) * \
 #                       (1.0/np.math.factorial(n))
 #        for b in range(len(beta)-1):
-#            S[b] += alpha_n_term * Tn[b]
+#            S[b] += aTerms * Tn[b]
 #        Tn = convolve(beta,T1,Tn,len(beta))
 #        plt.plot(beta,S,color=scalarMap.to_rgba(n))
 #    return diffs
 
 
 
-#numIter = 100
-#scalarMap, colorBar = prepPlot(list(range(numIter)))
-
-#alpha = 3.0
-#numBeta = 100
-#beta = np.linspace(0,30,numBeta) 
-
 def getConvergenceOfSum(alpha,beta,numIter):
     inputT1,lambda_s = getT1(continRho,alpha,rhoBeta)
-    T1 = [interpolate(rhoBeta,inputT1,abs(beta[i]),lambda_s) for i in range(len(beta))]
+    T1 = [interpolate(rhoBeta,inputT1,abs(beta[i]),lambda_s) \
+            for i in range(len(beta))]
     Tn = T1[:]
     diffs = [0.0]*(numIter-1)
+    aTerms = exp(-alpha*lambda_s)
     for n in range(1,numIter):
-        alpha_n_term = (exp(-alpha*lambda_s)*(alpha)**n) * \
-                       (1.0/np.math.factorial(n))
-        diffs[n-1] = sum([alpha_n_term * Tn[b] * (beta[b+1]-beta[b]) \
+        aTerms *= alpha / (1.0*n)
+        diffs[n-1] = sum([aTerms*Tn[b]*(beta[b+1]-beta[b]) \
                           for b in range(len(beta)-1)])
         Tn = convolve(beta,T1,Tn,len(beta))
     return diffs
@@ -99,20 +93,44 @@ def getConvergenceOfSum(alpha,beta,numIter):
 #plt.plot(diffs)
 #plt.show()
 #print(diffs)
+numIter = 50 
+numIter = 2
+#scalarMap, colorBar = prepPlot(list(range(numIter)))
 
-#peakLocations = []
-#for alpha in [0.001,0.05,0.1,1.0,3.0,5.0,10.0]:
-#    print(alpha)
-#    diffs = getConvergenceOfSum(alpha,beta,numIter)
-#    plt.plot([x/sum(diffs) for x in diffs])
-#    peakLocations.append(diffs.index(max(diffs)))
-#    
+numBeta = 300
+beta = np.linspace(0,20,numBeta) 
 
+
+alphas = [0.001,0.05,0.1]#,1.0,3.0,5.0,10.0]
+alphas = np.linspace(0.001,3.0,10)
+alphas = [0.1,0.2,0.5,1.0,2.0,2.5,3.0]
+
+peakLocations = []
+convergenceLocations = [None]*len(alphas)
+for a,alpha in enumerate(alphas):
+    print(alpha)
+    diffs = getConvergenceOfSum(alpha,beta,numIter)
+    plt.plot([x/sum(diffs) for x in diffs],label=str(alpha))
+    peakLocations.append(diffs.index(max(diffs)))
+    #for i in range(peakLocations[-1],len(diffs)):
+    #    if diffs[i] < 1e-6:
+    #        convergenceLocations[a] = i
+    #        break
+    break
+
+"""
+plt.xlabel('# Iterations')
+plt.ylabel('Contribution to S(a,b)')
+plt.legend(loc='best')
+plt.show()
+plt.plot(alphas,peakLocations,'ro')
+plt.plot(alphas,peakLocations,'r')
+plt.xlabel('alpha')
+plt.ylabel('# Iterations necessary to get to Peak')
+plt.show()
+#plt.plot(convergenceLocations)
 #plt.show()
-
-
-#plt.plot(peakLocations)
-#plt.show()
+"""
 
 
 
@@ -136,6 +154,7 @@ def getConvergenceOfSum(alpha,beta,numIter):
 
 
 
+"""
 
 
 numIter = 50
@@ -157,6 +176,7 @@ for i in range(len(diffs)):
 
 
 print(max(diffs))
+"""
 
 
 

@@ -13,8 +13,6 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
 
 rhoBeta = np.arange(0,0.00255*len(continRho),0.00255)
 
-continRho = [1,3,5,3,1]
-rhoBeta = [1,2,3,4,5]
 
 def getT1(continRho,alpha,rhoBeta):
     # Construct P(b) = rho(b) / 2*b*sinh(b/2)
@@ -72,45 +70,96 @@ def getConvergenceOfSum(alpha,beta,numIter,rhoBeta):
     Tn = T1[:]
     diffs = [0.0]*(numIter-1)
     aTerms = exp(-alpha*lambda_s)
-    for n in range(1,numIter):
+
+    sab = [0.0]*len(beta)
+    n = 1
+    diffs = []
+    while True:
         aTerms *= alpha / (1.0*n)
-        diffs[n-1] = sum([aTerms*Tn[b]*(beta[b+1]-beta[b]) \
-                          for b in range(len(beta)-1)])
+        #diffs.append(sum([aTerms*Tn[b]*(beta[b+1]-beta[b]) \
+        #                  for b in range(len(beta)-1)]))
+        differences = 0.0
+        for b in range(len(beta)):
+            if (sab[b] > 1e-6 ):
+                differences += aTerms*Tn[b] / sab[b]
+            sab[b] = aTerms *Tn[b]
+        diffs.append(differences)
         Tn = convolve(beta,T1,Tn,len(beta))
-        #print(np.trapz(T1,x=beta)/lambda_s)
+        n += 1
+        if (len(diffs)>5 and diffs[-1] < 1e-6):
+            return diffs
     return diffs
 
-numIter = 5
+    #for n in range(1,numIter):
+    #    aTerms *= alpha / (1.0*n)
+    #    diffs[n-1] = sum([aTerms*Tn[b]*(beta[b+1]-beta[b]) \
+    #                      for b in range(len(beta)-1)])
+    #    Tn = convolve(beta,T1,Tn,len(beta))
+    #return diffs
+
+numIter = 20
 numBeta = 300
 beta = np.linspace(0,20,numBeta) 
 
 
 alphas = [0.1,0.2,0.5,1.0,2.0,2.5,3.0]
+alphas = [0.1,0.5,1.0,2.5,4.0,5.0,10.0]
 
 peakLocations = []
-convergenceLocations = [None]*len(alphas)
+convergenceLocations1 = []
+convergenceLocations2 = []
+convergenceLocations3 = []
+convergenceLocations4 = []
+convergenceLocations5 = []
+
+def getConvergenceLocation(location,diffs,tol):
+    for i in range(location,len(diffs)):
+        if diffs[i] < tol:
+            return i
+
+tols = [1e-6,1e-4,1e-3,1e-2,1e-1]
+tols = [1e-6,20,40,80,120]
 for a,alpha in enumerate(alphas):
-    #print(alpha)
     diffs = getConvergenceOfSum(alpha,beta,numIter,rhoBeta)
-    plt.plot([x/sum(diffs) for x in diffs],label=str(alpha))
+    #plt.plot([x/sum(diffs) for x in diffs],label=str(alpha))
     peakLocations.append(diffs.index(max(diffs)))
+    peak = peakLocations[-1]
+    convergenceLocations1.append(len(diffs))
+    convergenceLocations2.append(getConvergenceLocation(peak,diffs,tols[1]))
+    convergenceLocations3.append(getConvergenceLocation(peak,diffs,tols[2]))
+    convergenceLocations4.append(getConvergenceLocation(peak,diffs,tols[3]))
+    convergenceLocations5.append(getConvergenceLocation(peak,diffs,tols[4]))
 
 
 
 
 
-"""
-plt.xlabel('# Iterations')
-plt.ylabel('Contribution to S(a,b)')
+
+
+colors = ['#ff0000', '#ff4000', '#ff8000', '#ffbf00', '#ffff00']
+
+
+#plt.xlabel('# Iterations')
+#plt.ylabel('Contribution to S(a,b)')
+#plt.legend(loc='best')
+#plt.show()
+#plt.plot(alphas,convergenceLocations1E6,'bo')
+plt.plot(alphas,convergenceLocations1,colors[0],label=str(tols[0])+'%')
+plt.plot(alphas,convergenceLocations2,colors[1],label=str(tols[1])+'%')
+plt.plot(alphas,convergenceLocations3,colors[2],label=str(tols[2])+'%')
+plt.plot(alphas,convergenceLocations4,colors[3],label=str(tols[3])+'%')
+plt.plot(alphas,convergenceLocations5,colors[4],label=str(tols[4])+'%')
+#plt.plot(alphas,peakLocations,'k',label='peak')
+#plt.plot(alphas,convergenceLocations1E3,'go')
+#plt.plot(alphas,convergenceLocations1E3,'g',label='convergence (1e-3)')
 plt.legend(loc='best')
-plt.show()
-plt.plot(alphas,peakLocations,'ro')
-plt.plot(alphas,peakLocations,'r')
 plt.xlabel('alpha')
-plt.ylabel('# Iterations necessary to get to Peak')
+#plt.ylabel('# Iterations necessary to get to Peak')
+plt.ylabel('# Iterations')
 plt.show()
 #plt.plot(convergenceLocations)
 #plt.show()
+"""
 """
 
 

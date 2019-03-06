@@ -13,17 +13,20 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
 
 rhoBeta = np.arange(0,0.00255*len(continRho),0.00255)
 
+continRho = [1,3,5,3,1]
+rhoBeta = [1,2,3,4,5]
+
 def getT1(continRho,alpha,rhoBeta):
     # Construct P(b) = rho(b) / 2*b*sinh(b/2)
     P  = [continRho[1]/rhoBeta[1]**2] 
     P += [continRho[b]/(2*rhoBeta[b]*np.sinh(rhoBeta[b]*0.5)) \
             for b in range(1,len(rhoBeta))]
     
-    lambda_s = P[0] *2.0*np.cosh(rhoBeta[0 ]*0.5)*0.5*(rhoBeta[1] -rhoBeta[0] ) + \
-               P[-1]*2.0*np.cosh(rhoBeta[-1]*0.5)*0.5*(rhoBeta[-1]-rhoBeta[-2])
-
-    for b in range(1,len(rhoBeta)-1):
-        lambda_s += P[b]*2.0*np.cosh(rhoBeta[b]*0.5)*(rhoBeta[b]-rhoBeta[b-1])
+    lambda_s = 0.0
+    for i in range(len(rhoBeta)-1):
+        lambda_s += ( P[i]*np.exp(-rhoBeta[i]*0.5) + \
+                      P[i+1]*np.exp(-rhoBeta[i+1]*0.5) ) * \
+                    ( rhoBeta[i+1]-rhoBeta[i] ) * 0.5
     
     inputT1 = [P[b]*exp(-rhoBeta[b]*0.5) for b in range(len(rhoBeta))] 
     return inputT1,lambda_s
@@ -60,24 +63,10 @@ def convolve(beta,T1,Tlast,numBeta):
                      (beta[bp+1]-beta[bp]) * 0.5
     return Tn
 
-#def getSum(alpha,beta,numIter=50):
-#    inputT1,lambda_s = getT1(continRho,alpha,rhoBeta)
-#    T1 = [interpolate(rhoBeta,inputT1,abs(beta[i])) for i in range(len(beta))]
-#    Tn = T1[:]
-#    S = [exp(-alpha*lambda_s)] + [0.0]*(len(beta)-1)
-#    for n in range(1,numIter):
-#        aTerms = (exp(-alpha*lambda_s)*(alpha)**n) * \
-#                       (1.0/np.math.factorial(n))
-#        for b in range(len(beta)-1):
-#            S[b] += aTerms * Tn[b]
-#        Tn = convolve(beta,T1,Tn,len(beta))
-#        plt.plot(beta,S,color=scalarMap.to_rgba(n))
-#    return diffs
 
-
-
-def getConvergenceOfSum(alpha,beta,numIter):
+def getConvergenceOfSum(alpha,beta,numIter,rhoBeta):
     inputT1,lambda_s = getT1(continRho,alpha,rhoBeta)
+    beta = rhoBeta[:]
     T1 = [interpolate(rhoBeta,inputT1,abs(beta[i]),lambda_s) \
             for i in range(len(beta))]
     Tn = T1[:]
@@ -88,35 +77,27 @@ def getConvergenceOfSum(alpha,beta,numIter):
         diffs[n-1] = sum([aTerms*Tn[b]*(beta[b+1]-beta[b]) \
                           for b in range(len(beta)-1)])
         Tn = convolve(beta,T1,Tn,len(beta))
+        #print(np.trapz(T1,x=beta)/lambda_s)
     return diffs
-#diffs = getConvergenceOfSum(alpha,beta,numIter)
-#plt.plot(diffs)
-#plt.show()
-#print(diffs)
-numIter = 50 
-numIter = 2
-#scalarMap, colorBar = prepPlot(list(range(numIter)))
 
+numIter = 5
 numBeta = 300
 beta = np.linspace(0,20,numBeta) 
 
 
-alphas = [0.001,0.05,0.1]#,1.0,3.0,5.0,10.0]
-alphas = np.linspace(0.001,3.0,10)
 alphas = [0.1,0.2,0.5,1.0,2.0,2.5,3.0]
 
 peakLocations = []
 convergenceLocations = [None]*len(alphas)
 for a,alpha in enumerate(alphas):
-    print(alpha)
-    diffs = getConvergenceOfSum(alpha,beta,numIter)
+    #print(alpha)
+    diffs = getConvergenceOfSum(alpha,beta,numIter,rhoBeta)
     plt.plot([x/sum(diffs) for x in diffs],label=str(alpha))
     peakLocations.append(diffs.index(max(diffs)))
-    #for i in range(peakLocations[-1],len(diffs)):
-    #    if diffs[i] < 1e-6:
-    #        convergenceLocations[a] = i
-    #        break
-    break
+
+
+
+
 
 """
 plt.xlabel('# Iterations')

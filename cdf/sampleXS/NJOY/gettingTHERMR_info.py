@@ -28,11 +28,14 @@ def readFile3IntoVector():
     line = f.readline()
     E_vec, xs_vec = [], []
     while line:
-        thisLine = [makeFloat(x) for x in line[:66].split()]
+        vec = line.split()[:-2]
+        if '1301' in vec[-1]:
+            temp = vec[-1] + ' '
+            vec[-1] = temp.replace('1301 ','')
+        thisLine = [makeFloat(x) for x in vec]
         E_vec += [thisLine[i] for i in range(0,len(thisLine),2)]
         xs_vec += [thisLine[i] for i in range(1,len(thisLine),2)]
         line = f.readline()
-
     f.close()
     return E_vec, xs_vec 
 
@@ -59,7 +62,7 @@ def readFile6IntoVector():
     while line:
         vec = line.split()
         if len(vec) > 0:
-            if vec[0] == '0.000000+0' and startingNewChunk:
+            if vec[0] == '0.000000+0' and vec[2] == '0' and startingNewChunk:
                 allEnergies.append(makeFloat(vec[1]))
                 startingNewChunk = False
                 if currentChunk != '': allDatas.append(currentChunk)
@@ -76,13 +79,33 @@ def makeVecFile6(data):
     dataVec = data.split()
     finalDataVec = []
     for i in range(len(dataVec)):
+        #print(dataVec[i])
         if len(dataVec[i]) > 11:
-            if dataVec[i][11] == '-':
-                finalDataVec.append(makeFloat(dataVec[i][:11]))
-                finalDataVec.append(makeFloat(dataVec[i][11:]))
-            elif dataVec[i][10] == '-':
-                finalDataVec.append(makeFloat(dataVec[i][:10]))
-                finalDataVec.append(makeFloat(dataVec[i][10:]))
+            minusLoc = None
+            dotLoc   = None
+            beginning = 0
+            for j in range(len(dataVec[i])):
+                #print('--------- ',dataVec[i][j])
+                if dataVec[i][j] == '-': minusLoc = j
+                if dataVec[i][j] == '.': dotLoc = j
+                if minusLoc != None and dotLoc != None and dotLoc == minusLoc + 2:
+                    #print(dataVec[i][beginning:minusLoc])
+                    finalDataVec.append(makeFloat(dataVec[i][beginning:minusLoc]))
+                    beginning = minusLoc
+                    minusLoc = None
+                    dotLoc = None
+            finalDataVec.append(makeFloat(dataVec[i][beginning:]))
+                
+            #print(finalDataVec[-2:])
+            #if dataVec[i][11] == '-':
+            #    for j in range(0,len(dataVec[i])+1,11):
+            #        if len(dataVec[i][j:j+11]) > 0:
+            #            finalDataVec.append(makeFloat(dataVec[i][j:j+11]))
+            #elif dataVec[i][10] == '-':
+            #    for j in range(0,len(dataVec[i])+1,10):
+            #        print(dataVec[i][j:j+10])
+            #        if len(dataVec[i][j:j+10]) > 0:
+            #            finalDataVec.append(makeFloat(dataVec[i][j:j+10]))
         else:
             finalDataVec.append(makeFloat(dataVec[i]))
     return finalDataVec
@@ -105,14 +128,12 @@ xs_vec = xs_vec[:-1]
 # ----------------------------------------------------------------------------
 # Read in File6 E->E matrix
 # ----------------------------------------------------------------------------
-allEnergies, allDatas = readFile6IntoVector()
-energies = allEnergies[:]
-datas = allDatas[:]
-#scalarMap, colorBar = prepPlot(allEnergies)
+energies, datas = readFile6IntoVector()
+#scalarMap, colorBar = prepPlot(energies)
+#makeVecFile6(datas[1])
 #for i,E_in in enumerate(energies):
 #    x,y,z = [],[],[]
 #    data = makeVecFile6(datas[i])
-#
 #    for j in range(int(len(data)/3)):
 #        x.append(data[3*j])
 #        y.append(data[3*j+1])
@@ -128,8 +149,9 @@ datas = allDatas[:]
 # ----------------------------------------------------------------------------
 # Combine them both 
 # ----------------------------------------------------------------------------
-scalarMap, colorBar = prepPlot(allEnergies)
+scalarMap, colorBar = prepPlot(energies)
 for i,E_in in enumerate(energies):
+    if E_in > 1e-4: continue
     x,y,z = [],[],[]
     file6_data = makeVecFile6(datas[i])
     xsValue = interpolate(E_vec,xs_vec,E_in)
@@ -144,6 +166,8 @@ plt.colorbar(colorBar).ax.set_ylabel('energies')
 plt.show()
 
 
+"""
 
 
+"""
 	

@@ -165,9 +165,10 @@ def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas,aMin):
 A, T = 1.0, 296.0
 kb = 8.6173303e-5
 
-nAlpha, nBeta = 500, 500
+nAlpha, nBeta = 100, 1000
 alphas = list(np.linspace(0.0001,30,nAlpha))
-betas  = list(np.linspace(0.00,30,nBeta))
+betas  = list(np.linspace(0.00,300,nBeta))
+betas  = list(np.logspace(-6,2.1,nBeta))
 
 useNJOY  = True
 fullRedo = False  
@@ -180,16 +181,16 @@ SAB = getSAB(alphas,betas,T,continRho,useNJOY,fullRedo,width,oscE,oscW)
 fullSAB = getFullSAB(alphas,betas,fullBetas,SAB)
 
 N = 500
+N = int(100000)
 N = 50000
-N = int(5e5)
 
 Energies = [0.0253]
 Energies = [0.005,0.01,0.95]
 Energies = [0.01]
-Energies = [3.12]
 Energies = [3.0]
 Energies = [0.005]
 Energies = [0.0253]
+Energies = [3.12]
 Energies = [0.0005,0.0253,0.2907,0.95,3.12]
 #scalarMap, colorBar = prepPlot(Energies)
 
@@ -203,6 +204,8 @@ for i,E in enumerate(Energies):
 
     xsi_Vals = []
     for n in range(N):
+        if n in [1000,3000,10000,50000]:
+            print(n)
         index,beta = sampleCDF(relevantBetas,betaCDF)
 
         """

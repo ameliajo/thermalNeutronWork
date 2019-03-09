@@ -10,37 +10,6 @@ import matplotlib.cm as cmx
 import seaborn as sns  # for nicer graphics
 
 
-
-
-def prepPlot(alphas):
-    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+2)
-    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
-    #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
-    mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
-            [scalarMap.to_rgba(a) for a in range(len(alphas))])
-    colorBar = plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
-    plt.clf()
-    return scalarMap, colorBar
-
-
-
-def finishPlotting(colorBar,title):
-    ax = plt.gca()
-    plt.colorbar(colorBar).ax.set_ylabel('energies')
-    #plt.title(title)
-    #ax.set_facecolor('xkcd:light grey blue') # off white
-    #ax.set_facecolor('xkcd:very light blue') # off white
-    #plt.yscale('log')
-    plt.show()
-
-
-
-
-
-def getSABval(sab,a,b,nBeta):
-    return sab[a*nBeta+b]
-
-
 def getFullSAB(alphas,betas,fullBetas,sabs): 
     fullSAB = [0.0]*(2*len(betas)-1)*len(alphas)
     for a in range(len(alphas)):
@@ -48,16 +17,15 @@ def getFullSAB(alphas,betas,fullBetas,sabs):
             bForLookup = abs(b-len(betas)+1)
             assert(abs(fullBetas[b]) == betas[bForLookup])
             # This creates the symmetric SAB
-            fullSAB[a*len(fullBetas)+b] = getSABval(sabs,a,bForLookup,len(betas))
+            fullSAB[a*len(fullBetas)+b] = sabs[a*len(betas)+bForLookup]
             # We make it asymmetric to make sure it matches eq14
             if (fullBetas[b] > 0): fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b])
     return fullSAB
 
 
 def getAlphaMinMax(E,beta,kb,T,A):
-    aMin = ( (E)**0.5 - (E+beta*kb*T)**0.5 )**2 / ( A*kb*T )
-    aMax = ( (E)**0.5 + (E+beta*kb*T)**0.5 )**2 / ( A*kb*T )
-    return aMin,aMax
+    return ( (E)**0.5 - (E+beta*kb*T)**0.5 )**2 / ( A*kb*T ),\
+           ( (E)**0.5 + (E+beta*kb*T)**0.5 )**2 / ( A*kb*T )
 
 
 def getAlphaMinMaxIndices(E,beta,kb,T,A,alphas):
@@ -69,9 +37,6 @@ def getAlphaMinMaxIndices(E,beta,kb,T,A,alphas):
         if alphas[a] > aMin and aMin_index == 0: aMin_index = a
         if alphas[a] <= aMax:                    aMax_index = a
     return aMin_index,aMax_index
-
-
-
 
 
 def getValidBetasRange(A,E,T,fullBetas):
@@ -94,8 +59,8 @@ def intSABda(A,E,T,fullSAB,fullBetas,b):
     denominator = 0.0
     for a in range(len(alphas)-1):
         if aMin <= alphas[a] <= aMax:
-            sabL = getSABval(fullSAB,a,b,len(fullBetas))
-            sabR = getSABval(fullSAB,a+1,b,len(fullBetas))
+            sabL = fullSAB[a*len(fullBetas)+b]
+            sabR = fullSAB[(a+1)*len(fullBetas)+b]
             denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
     return denominator
 
@@ -126,11 +91,11 @@ def calcBetaCDF(betas,eq14,bMin):
 
 
 
-def PDF_CDF_at_various_temperatures(A,E,T,fullSAB,fullBetas):
+def getBetaCDF(A,E,T,fullSAB,fullBetas):
     bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
-    eq14 = calcBetaPDF(A,E,T,fullSAB,fullBetas,bMin,bMax)
-    eq16 = calcBetaCDF(fullBetas,eq14,bMin)
-    return fullBetas[bMin:bMax-1],eq16
+    betaPDF = calcBetaPDF(A,E,T,fullSAB,fullBetas,bMin,bMax)
+    betaCDF = calcBetaCDF(fullBetas,betaPDF,bMin)
+    return fullBetas[bMin:bMax-1],betaCDF
 
 
 def sampleCDF(x,CDF):
@@ -138,19 +103,16 @@ def sampleCDF(x,CDF):
     for i in range(len(x)-1):
         if CDF[i] <= xsi < CDF[i+1]:
             frac  = (xsi-CDF[i])/(CDF[i+1]-CDF[i])
-            val = frac*(x[i+1]-x[i])+x[i]
-            return i,val
-
-
+            return i,frac*(x[i+1]-x[i])+x[i]
 
 def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas,aMin):
     denominator = 0.0
     for a in range(nAlpha-1):
-        sabL = getSABval(fullSAB,a,index,nFullBetas)
-        sabR = getSABval(fullSAB,a+1,index,nFullBetas)
+        sabL = fullSAB[a*nFullBetas+index]
+        sabR = fullSAB[(a+1)*nFullBetas+index]
         denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
 
-    alphaPDF = [getSABval(fullSAB,a,index,nFullBetas)/denominator \
+    alphaPDF = [fullSAB[a*nFullBetas+index]/denominator \
                 for a in range(nAlpha)]
 
     alphaCDF = [0.0]*nAlpha
@@ -159,54 +121,48 @@ def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas,aMin):
                       0.5*(alphas[a]-alphas[a-1])
     return alphaCDF
 
-
-
-
 A, T = 1.0, 296.0
 kb = 8.6173303e-5
 
 nAlpha, nBeta = 100, 1000
-alphas = list(np.linspace(0.0001,30,nAlpha))
+alphas = list(np.linspace(0.0001,3,nAlpha))
 betas  = list(np.linspace(0.00,300,nBeta))
 betas  = list(np.logspace(-6,2.1,nBeta))
 
 useNJOY  = True
-fullRedo = False  
-fullRedo = True
 width    = None 
+fullRedo = True
+fullRedo = False  
 
 
 fullBetas = [-x for x in betas[1:]][::-1] + betas
 SAB = getSAB(alphas,betas,T,continRho,useNJOY,fullRedo,width,oscE,oscW) 
 fullSAB = getFullSAB(alphas,betas,fullBetas,SAB)
 
-N = 500
-N = int(100000)
 N = 50000
 
-Energies = [0.0253]
-Energies = [0.005,0.01,0.95]
-Energies = [0.01]
-Energies = [3.0]
-Energies = [0.005]
-Energies = [0.0253]
-Energies = [3.12]
 Energies = [0.0005,0.0253,0.2907,0.95,3.12]
-#scalarMap, colorBar = prepPlot(Energies)
-
+Energies = [3.12]
 
 for i,E in enumerate(Energies):
-    E_out_vec = []
-    betas_vec= []
     print("E = ",E)
 
-    relevantBetas, betaCDF = PDF_CDF_at_various_temperatures(A,E,T,fullSAB,fullBetas)
+    
+    bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
+    print(fullBetas[bMin],fullBetas[bMax])
+    CDF_beta_vals, betaCDF = getBetaCDF(A,E,T,fullSAB,fullBetas)
+    print(CDF_beta_vals[15],betaCDF[15])
+    plt.plot(CDF_beta_vals,betaCDF)
+    plt.show()
+    #break
+
+    E_out_vec = []
 
     xsi_Vals = []
     for n in range(N):
         if n in [1000,3000,10000,50000]:
             print(n)
-        index,beta = sampleCDF(relevantBetas,betaCDF)
+        index,beta = sampleCDF(CDF_beta_vals,betaCDF)
 
         """
         aMin, aMax = getAlphaMinMaxIndices(E,beta,kb,T,A,alphas)
@@ -225,11 +181,11 @@ for i,E in enumerate(Energies):
         """
 
         E_out_vec.append((beta*kb*T+E))
-        #betas_vec.append((beta))
+    print("MIN",min(E_out_vec))
+    #break
 
 
     #sns.kdeplot(E_out_vec,shade=True);
-    #print(min(betas_vec),max(betas_vec))
     #print(min(E_out_vec),max(E_out_vec))
     #plt.hist(E_out_vec,bins=np.logspace(-3,1,500),normed=True,alpha=0.3)
     #sns.kdeplot(E_out_vec,label=str(E)+' eV',shade=True,cut=10);
@@ -242,25 +198,15 @@ for i,E in enumerate(Energies):
 #sns.kdeplot(E_out_vec);
 plt.gca().set_xscale("log")
 plt.yscale('log', nonposy='clip')
-
-#plt.xscale('log')
-#plt.yscale('log')
-
 axes = plt.gca()
-axes.set_xlim([1e-3,1e1])
-axes.set_ylim([1e-3,1e3])
+#axes.set_xlim([1e-3,1e1])
+#axes.set_ylim([1e-3,1e3])
 
 
 plt.show()
+"""
+"""
 
-
-
-
-#plt.plot(relevantBetas,betaCDF)
-#plt.xlabel('alpha')
-#plt.ylabel('beta')
-
-#finishPlotting(colorBar,"")
 
 
 

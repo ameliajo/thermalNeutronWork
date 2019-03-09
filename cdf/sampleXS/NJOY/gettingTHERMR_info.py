@@ -94,7 +94,8 @@ def makeVecFile6(data):
 
 if __name__ == '__main__':
 
-    toPrint = { 'xs':True, 'probMatrix':True, 'fullScat':True }
+    toPrint = {'xs':True, 'probMatrix':True, 'fullScat':True}
+    toPrint = {'xs':False, 'probMatrix':False, 'fullScat':False, 'specificE':True}
 
     # --------------------------------------------------------------------------
     # Read in File3 XS Data
@@ -132,9 +133,6 @@ if __name__ == '__main__':
 
 
     if toPrint['fullScat']:
-        # ----------------------------------------------------------------------
-        # Combine them both 
-        # ----------------------------------------------------------------------
         areas = []
         scalarMap, colorBar = prepPlot(energies)
         for i,E_in in enumerate(energies):
@@ -149,5 +147,33 @@ if __name__ == '__main__':
         plt.colorbar(colorBar).ax.set_ylabel('energies')
         ax = plt.gca()
         plt.show()
+
+    if toPrint['specificE']:
+
+        specifiedE = [0.0005,0.0253,0.2907]
+
+        for E in specifiedE:
+            index = None
+            for i in range(len(energies)-1):
+                if energies[i] <= E < energies[i+1]:
+                    index = i; break
+            if index != None:
+                x,y = [],[]
+                file6_data = makeVecFile6(datas[index])
+                xsValue = interpolate(E_vec,xs_vec,energies[index])
+                for j in range(int(len(file6_data)/3)):
+                    x.append(file6_data[3*j])
+                    y.append(file6_data[3*j+1]*xsValue)
+
+                print(energies[index])
+                
+                plt.plot(x,y,label=str(E)+' eV')
+        plt.xscale('log'); plt.yscale('log')
+        plt.xlabel("E' [eV]")
+        plt.ylabel("Prob / eV")
+        plt.legend(loc='best')
+        ax = plt.gca()
+        plt.show()
+
 
 

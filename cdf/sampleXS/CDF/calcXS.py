@@ -9,6 +9,14 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import seaborn as sns  # for nicer graphics
 
+def prepPlot(alphas):
+    plt.clf()
+    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+2)
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
+    mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
+            [scalarMap.to_rgba(a) for a in range(len(alphas))])
+    return scalarMap, plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
+
 
 def getFullSAB(alphas,betas,fullBetas,sabs): 
     fullSAB = [0.0]*(2*len(betas)-1)*len(alphas)
@@ -16,9 +24,7 @@ def getFullSAB(alphas,betas,fullBetas,sabs):
         for b in range(len(fullBetas)):
             bForLookup = abs(b-len(betas)+1)
             assert(abs(fullBetas[b]) == betas[bForLookup])
-            # This creates the symmetric SAB
             fullSAB[a*len(fullBetas)+b] = sabs[a*len(betas)+bForLookup]
-            # We make it asymmetric to make sure it matches eq14
             if (fullBetas[b] > 0): fullSAB[a*len(fullBetas)+b] *= np.exp(-fullBetas[b])
     return fullSAB
 
@@ -76,6 +82,11 @@ def calcBetaPDF(A,E,T,fullSAB,fullBetas,bMin,bMax):
 
     eq14 = [ intSABda(A,E,T,fullSAB,fullBetas,b) / denominator \
            for b in range(bMin,bMax-1)]
+    """
+    plt.plot(fullBetas[bMin:bMax-1],eq14)
+    plt.xlabel('beta'); plt.ylabel('beta PDF')
+    plt.show()
+    """
     return eq14
 
 
@@ -95,15 +106,33 @@ def getBetaCDF(A,E,T,fullSAB,fullBetas):
     bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
     betaPDF = calcBetaPDF(A,E,T,fullSAB,fullBetas,bMin,bMax)
     betaCDF = calcBetaCDF(fullBetas,betaPDF,bMin)
+    """
+    plt.plot(fullBetas[bMin:bMax-1],betaCDF)
+    plt.xlabel('beta'); plt.ylabel('beta CDF')
+    plt.show()
+    exit() 
+    """
     return fullBetas[bMin:bMax-1],betaCDF
+
+
+def binarySearch(vec,val):
+    if len(vec) == 1: return 0
+    if len(vec) == 2: return 1 if abs(vec[1]-val) < 1e-6 else 0
+    if len(vec) == 3:
+        return 0 if vec[0] <= val < vec[1] else \
+               1 if vec[1] <= val < vec[2] else 2
+    halfway = int(len(vec)*0.5)
+    if abs(vec[halfway]-val) < 1e-6: return halfway
+    return binarySearch(vec[:halfway],val) if val <= vec[halfway] else \
+           binarySearch(vec[halfway:],val) + halfway
+
 
 
 def sampleCDF(x,CDF):
     xsi = random.random()
-    for i in range(len(x)-1):
-        if CDF[i] <= xsi < CDF[i+1]:
-            frac  = (xsi-CDF[i])/(CDF[i+1]-CDF[i])
-            return i,frac*(x[i+1]-x[i])+x[i]
+    i = binarySearch(CDF,xsi)
+    frac  = (xsi-CDF[i])/(CDF[i+1]-CDF[i])
+    return i,frac*(x[i+1]-x[i])+x[i],xsi
 
 def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas,aMin):
     denominator = 0.0
@@ -124,10 +153,23 @@ def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas,aMin):
 A, T = 1.0, 296.0
 kb = 8.6173303e-5
 
-nAlpha, nBeta = 100, 1000
-alphas = list(np.linspace(0.0001,3,nAlpha))
-betas  = list(np.linspace(0.00,300,nBeta))
+nAlpha, nBeta = 50, 100
+alphas = list(np.linspace(0.001,3,nAlpha))
 betas  = list(np.logspace(-6,2.1,nBeta))
+
+nAlpha, nBeta = 50, 100
+alphas = list(np.linspace(0.001,3,nAlpha))
+betas  = list(np.logspace(-6,2.1,nBeta))
+
+nAlpha, nBeta = 100, 1000
+alphas = list(np.linspace(1.0,32.0,nAlpha))
+alphas = list(np.linspace(0.0,32.0,nAlpha))
+betas  = list(np.logspace(-6,1.3,nBeta))
+print(kb*T)
+
+
+
+
 
 useNJOY  = True
 width    = None 
@@ -135,34 +177,58 @@ fullRedo = True
 fullRedo = False  
 
 
-fullBetas = [-x for x in betas[1:]][::-1] + betas
 SAB = getSAB(alphas,betas,T,continRho,useNJOY,fullRedo,width,oscE,oscW) 
+
+"""
+scalarMap, colorBar = prepPlot(alphas)
+for a in range(0,nAlpha):
+    plt.plot(betas,[SAB[a*len(betas)+b] for b in range(len(betas))],label=str("alpha = "+"%.3E"%alphas[a]),color=scalarMap.to_rgba(a),alpha=0.6)
+
+plt.colorbar(colorBar).ax.set_ylabel('alpha')
+plt.yscale('log')
+plt.xlabel('beta'); plt.ylabel('S_n.sym(a,-b)')
+plt.show()
+"""
+
+fullBetas = [-x for x in betas[1:]][::-1] + betas
 fullSAB = getFullSAB(alphas,betas,fullBetas,SAB)
 
-N = 50000
+"""
+scalarMap, colorBar = prepPlot(alphas)
+for a in range(0,nAlpha):
+    plt.plot(fullBetas,[fullSAB[a*len(fullBetas)+b] for b in range(len(fullBetas))],label=str("alpha = "+"%.3E"%alphas[a]),color=scalarMap.to_rgba(a),alpha=0.4)
+plt.colorbar(colorBar).ax.set_ylabel('alpha')
+plt.yscale('log')
+plt.xlabel('beta'); plt.ylabel('S_n.sym(a,b)')
+plt.show()
+"""
+
+
+N = int(5e6)
 
 Energies = [0.0005,0.0253,0.2907,0.95,3.12]
-Energies = [3.12]
+#Energies = [3.12]
+Energies = [0.0255]
+xsiVals = []
+betaVals = []
 
 for i,E in enumerate(Energies):
+    #break
     print("E = ",E)
 
     
     bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
-    print(fullBetas[bMin],fullBetas[bMax])
     CDF_beta_vals, betaCDF = getBetaCDF(A,E,T,fullSAB,fullBetas)
-    print(CDF_beta_vals[15],betaCDF[15])
-    plt.plot(CDF_beta_vals,betaCDF)
-    plt.show()
-    #break
 
     E_out_vec = []
 
     xsi_Vals = []
     for n in range(N):
-        if n in [1000,3000,10000,50000]:
+        if n%50000 == 0:
             print(n)
-        index,beta = sampleCDF(CDF_beta_vals,betaCDF)
+        index,beta,xsi = sampleCDF(CDF_beta_vals,betaCDF)
+        xsiVals.append(xsi)
+        betaVals.append(beta)
 
         """
         aMin, aMax = getAlphaMinMaxIndices(E,beta,kb,T,A,alphas)
@@ -181,25 +247,17 @@ for i,E in enumerate(Energies):
         """
 
         E_out_vec.append((beta*kb*T+E))
-    print("MIN",min(E_out_vec))
-    #break
+    plt.hist(E_out_vec,normed=True,bins=np.logspace(-4.5,0,80),alpha=0.3)
+    print(min(E_out_vec),min(xsiVals),min(betaVals))
+    #plt.hist(E_out_vec,normed=True,alpha=0.3)
 
-
-    #sns.kdeplot(E_out_vec,shade=True);
-    #print(min(E_out_vec),max(E_out_vec))
-    #plt.hist(E_out_vec,bins=np.logspace(-3,1,500),normed=True,alpha=0.3)
-    #sns.kdeplot(E_out_vec,label=str(E)+' eV',shade=True,cut=10);
-    #sns.distplot(E_out_vec,bins=np.logspace(-3,1,2),hist=True,label=str(E)+' eV');
-    plt.hist(E_out_vec,normed=True,bins=np.logspace(-3,1,100),alpha=0.3)
-    #plt.hist(E_out_vec,bins=np.logspace(-3,1,500),normed=True,alpha=0.3)
-    #plt.hist(E_out_vec,bins=np.linspace(-40,5,100),alpha=0.3)
-    #plt.hist(E_out_vec,bins=np.linspace(0.0,3.5,100),alpha=0.3)
-
-#sns.kdeplot(E_out_vec);
 plt.gca().set_xscale("log")
 plt.yscale('log', nonposy='clip')
 axes = plt.gca()
-#axes.set_xlim([1e-3,1e1])
+plt.xlabel("E' [eV]")
+plt.ylabel("Probability")
+
+#axes.set_xlim([1e-4,1e0])
 #axes.set_ylim([1e-3,1e3])
 
 

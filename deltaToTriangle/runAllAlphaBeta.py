@@ -7,8 +7,8 @@ import matplotlib.cm as cmx
 
 
 def prepPlot():
-    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+3)
-    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('hot')) #hot autumn tab10
+    cnorm = colors.Normalize(vmin=0,vmax=2*len(alphas)+1)
+    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
     #scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
     mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
             [scalarMap.to_rgba(a) for a in range(len(alphas))])
@@ -22,7 +22,7 @@ def finishPlotting(colorBar,title):
     ax = plt.gca()
     plt.colorbar(colorBar).ax.set_ylabel('alpha values')
     #plt.title(title)
-    ax.set_facecolor('xkcd:light grey blue') # off white
+    #ax.set_facecolor('xkcd:light grey blue') # off white
     plt.yscale('log')
     plt.show()
 
@@ -46,25 +46,38 @@ def runAlphasBetas(opt0,opt1,alphas,betas,continRho,oscE,oscW,fullRedo=False):
         title  = 'my\nLEAPR vs NJOY LEAPR. Using '
         title += 'delta function approx.' if width0 == None else 'thin triangle approx.'
     A0 = 18.02; E = 0.01; kbT = 0.025851
+    A0 = 1.0; E = 0.50; kbT = 0.025851
 
     scalarMap, colorBar = prepPlot()
     ########################################################################
-    # Generate specified S(a,b)
+    # Generate specified S_nonsym(a,-b)
     SAB_1 = getSAB(alphas,betas,continRho,useNJOY1,fullRedo,width0,oscE,oscW)
     SAB_2 = getSAB(alphas,betas,continRho,useNJOY2,fullRedo,width1,oscE,oscW)
+    #print(betas_negative)
+
+    for a in range(len(alphas)):
+        for b in range(len(betas)):
+            SAB_1[a*len(betas)+b] *= np.exp(-betas[b]/2)
+            SAB_2[a*len(betas)+b] *= np.exp(-betas[b]/2)
+
+
+
+
+
+
     ########################################################################
     # Compare S(a,b) values
-    plotBetaForVariousAlpha(alphas,betas,SAB_1,A0,E,kbT,scalarMap,'.',False)
-    plotBetaForVariousAlpha(alphas,betas,SAB_2,A0,E,kbT,scalarMap,'.',True)
+    plotBetaForVariousAlpha(alphas,betas,SAB_1,A0,E,kbT,scalarMap,'.',True)
+    plotBetaForVariousAlpha(alphas,betas,SAB_2,A0,E,kbT,scalarMap,'.',False)
     finishPlotting(colorBar,'S(a,b) for H in H2O, generated with '+title)
     ########################################################################
     # Compare S(a,b) errors (percent)
-    plotErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
-    finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
+    #plotErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
+    #finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
     ########################################################################
     # Compare S(a,b) errors (absolute)
-    plotAbsoluteErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
-    finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
+    #plotAbsoluteErrorBetaForVariousAlpha(alphas,betas,SAB_1,SAB_2,A0,E,kbT,scalarMap)
+    #finishPlotting(colorBar,'S(a,b) error for H in H2O, generated with '+title)
     ########################################################################
 
 
@@ -86,14 +99,16 @@ if __name__=="__main__":
     betas = [0.03*i for i in range(1000)]
     alphas= [0.01*i for i in range(1,150)]
 
+    alphas= [0.1*i for i in range(1,150)]
     betas = [0.1001*i for i in range(300)]
-    alphas= [0.1*i for i in range(1,15)]
-
+    betas = list(np.linspace(0,30,100))
     betas += [7.8+0.01*i for i in range(50)]
     betas += [15.8+0.01*i for i in range(50)]
     betas += [18.7+0.01*i for i in range(200)]
     betas += [26.5+0.01*i for i in range(50)]
     #betas += list(np.linspace(18.701,18.9,40))
+    alphas = np.linspace(0.001,30,50)
+    #alphas = [10.0,200]
 
     betas.sort()
 
@@ -109,12 +124,12 @@ if __name__=="__main__":
 
     oscE = [ 0.204,    0.4794   ] 
     oscW = [ 0.166667, 0.333333 ]
-
     fullRedo = False
     fullRedo = True
     #opt0,opt1 = ('mine',None),('mine',2) # Works
+    opt0,opt1 = ('njoy',None),('njoy',2) # Works
     #opt0,opt1 = ('njoy',None),('njoy',6) # Works
-    opt0,opt1 = ('njoy',None),('mine',None) # Works
+    #opt0,opt1 = ('njoy',None),('mine',None) # Works
     #opt0,opt1 = ('mine',None),('njoy',None) # Works
     #opt0,opt1 = ('mine',2),('njoy',2) # Works
     #opt0,opt1 = ('mine',None),('njoy',2) # FAILS, diagonal comparison

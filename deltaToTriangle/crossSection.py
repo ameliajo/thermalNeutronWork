@@ -42,8 +42,8 @@ def finishPlotting(colorBar,colorBarName):
 
 alphas = [1e-7+ 0.10*i for i in range(100)]
 betas = [0.5*i for i in range(100)]
-alphas = list(np.linspace(1e-7,60,100))
-betas = list(np.linspace(0.0,50,500))
+alphas = list(np.linspace(1e-7,80,300))
+betas = list(np.linspace(0.0,50,800))
 continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0245, .029, .034, .0395, .045, .0506, .0562, .0622, .0686, .075, .083, .091,\
   .099, .107, .115, .1197, .1214, .1218, .1195, .1125, .1065, .1005, .09542,   \
@@ -82,10 +82,15 @@ def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec,A):
                                      sab[(a+1)*len(betas)+b+1],alpha)
 
             sabVal = interpolate(betaL,betaR,sab_betaL,sab_betaR,abs(beta))
-            if (beta < 0): 
-                sabVal *= np.exp(abs(beta))
+            #if(mu < 0.9999):
+            #    print(Ep,mu,alpha,beta,a,b)
+            #    print(sab_betaL,sabVal,sab_betaR)
+            #    print()
 
-            xs_vec.append((xs_bound/2*kb*T)*(Ep/E)**0.5*sabVal)
+            if (beta > 0): 
+                sabVal *= np.exp(-beta)
+
+            xs_vec.append((xs_bound/(2*kb*T))*(Ep/E)**0.5*sabVal)
             #xs_vec.append(sabVal)
         xs_each_mu.append(xs_vec)
     return xs_each_mu
@@ -94,16 +99,20 @@ def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec,A):
 
 
 if __name__=="__main__":
-    plot_Ep_mu = True
-    plot_Ep_Width = True
     plot_Ep_mu = False
+    plot_Ep_Width = True
+    plot_Ep_Width = False
+    plot_Ep_Width_pct_errors = True
+    plot_Ep_Width_pct_errors = False
+    plot_Ep_errors = False
+    plot_Ep_errors = True
     
     xs_bound = 20.449
     kb = 8.61733e-5
     T = 296.0
     E = 1.0
     A = 0.99917
-    Ep_vec = list(np.linspace(0.0,1.5,10000))
+    Ep_vec = list(np.linspace(0.0,1.5,1000))
     widths = list(range(2,12,2))
 
     NJOY_LEAPR = True
@@ -113,54 +122,89 @@ if __name__=="__main__":
     sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) \
                   for width in widths]
 
+
     if plot_Ep_mu:
         mu_vec = list(np.linspace(-1,1,64))
+        #mu_vec = list(np.linspace(0.98,1,2))
         scalarMap, colorBar = prepPlot(mu_vec)
         xs_vec = getXS_from_SAB(sabDELTA,alphas,betas,E,kb,T,Ep_vec,mu_vec,A)
         for i in range(len(mu_vec)):
             plt.plot(Ep_vec,xs_vec[i],color=scalarMap.to_rgba(i))
+            
         finishPlotting(colorBar,'mu')
 
     if plot_Ep_Width:
-        mu = 0.5
+        mu = 0.9
         scalarMap, colorBar = prepPlot([0]+widths)
 
         xsDELTA = getXS_from_SAB(sabDELTA,alphas,betas,E,kb,T,Ep_vec,[mu],A)[0]
         xsCONTINS = [getXS_from_SAB(sabCONTIN,alphas,betas,E,kb,T,Ep_vec,[mu],A)[0] \
                      for sabCONTIN in sabCONTINS]
 
-        """
         plt.plot(Ep_vec,xsDELTA,color=scalarMap.to_rgba(0),label='delta')
         for i,xsCONTIN in enumerate(xsCONTINS):
             plt.plot(Ep_vec,xsCONTIN,color=scalarMap.to_rgba(i+1),label='width = '+str(widths[i]))
+ 
         plt.legend(loc='best')
         plt.xlabel("E' (eV)")
         plt.ylabel("XS (b)")
         plt.show()
-        """
 
+    if plot_Ep_Width_pct_errors:
+        mu = 0.9
+        scalarMap, colorBar = prepPlot([0]+widths)
 
+        xsDELTA = getXS_from_SAB(sabDELTA,alphas,betas,E,kb,T,Ep_vec,[mu],A)[0]
+        xsCONTINS = [getXS_from_SAB(sabCONTIN,alphas,betas,E,kb,T,Ep_vec,[mu],A)[0] \
+                     for sabCONTIN in sabCONTINS]
 
-        totalError = []
-        for i,xsCONTIN in enumerate(xsCONTINS):
-            relError = [(xsCONTIN[i]-xsDELTA[i]) for i in range(len(xsDELTA))]
+        for j,xsCONTIN in enumerate(xsCONTINS):
+            #pctError = [100.0*(xsCONTIN[i]-xsDELTA[i])/xsDELTA[i] for i in range(len(xsDELTA))] \
+            #        if abs(xsDELTA[i]) > 1e-6 else \
+            #        [100.0*(xsCONTIN[i]-xsDELTA[i]) for i in range(len(xsDELTA))] 
+            toPlot = []
+            for i in range(len(xsDELTA)):
+                if xsCONTIN[i] < 1e-12 and xsDELTA[i] < 1e-12: toPlot.append(0.0)
+                else: toPlot.append(100.0*(xsCONTIN[i]-xsDELTA[i]) / \
+                                   (0.5*(abs(xsCONTIN[i])+abs(xsDELTA[i]))))
+                #else: toPlot.append(abs(xsCONTIN[i]-xsDELTA[i]))
+                #toPlot.append((xsCONTIN[i]-xsDELTA[i]))
 
-            percentError = [100.0*(xsDELTA[i]-xsCONTIN[i])/xsDELTA[i] \
-                            for i in range(len(xsDELTA))]
-            plt.plot(Ep_vec,percentError,color=scalarMap.to_rgba(i+1),label='width = '+str(widths[i]))
-            totalError.append(np.trapz([abs(x) for x in relError],x=Ep_vec))
-
-
-        plt.legend(loc='best')
+            plt.plot(Ep_vec,toPlot,color=scalarMap.to_rgba(j+1),label='width = '+str(widths[j]))
+        plt.legend(loc='lower left')
         plt.xlabel("E' (eV)")
         plt.ylabel("Error (%)")
         plt.show()
 
 
 
-        plt.plot(widths,totalError,'r')
-        plt.plot(widths,totalError,'ro')
+
+    if plot_Ep_errors:
+        mus = np.linspace(-1,1,21)
+        scalarMap, colorBar = prepPlot([0]+mus)
+        for j,mu in enumerate(mus):
+            print(mu)
+            xsDELTA = getXS_from_SAB(sabDELTA,alphas,betas,E,kb,T,Ep_vec,[mu],A)[0]
+            xsCONTINS = [getXS_from_SAB(sabCONTIN,alphas,betas,E,kb,T,Ep_vec,[mu],A)[0] \
+                         for sabCONTIN in sabCONTINS]
+
+            totalError = []
+            for xsCONTIN in xsCONTINS:
+                relError = [abs(xsCONTIN[i]-xsDELTA[i])/xsDELTA[i] for i in range(len(xsDELTA))]
+                totalError.append(np.trapz(relError,x=Ep_vec))
+
+
+            plt.plot(widths,totalError,color=scalarMap.to_rgba(j+1),label='mu = '+'%.3E'%mu)
+            plt.plot(widths,totalError,color=scalarMap.to_rgba(j+1),marker='o')
+        #plt.legend(loc='best')
+        plt.yscale('log')
+        plt.xlabel('triangle widths (# grid spaces)')
+        plt.ylabel("Absolute Error (b)")
+        ax = plt.gca()
+        plt.colorbar(colorBar).ax.set_ylabel('mu')
         plt.show()
+
+
 
 
 

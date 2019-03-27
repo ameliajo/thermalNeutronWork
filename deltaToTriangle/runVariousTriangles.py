@@ -22,6 +22,11 @@ betas = [7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.95,8, 8.05, 8.1, 8.
 betas = [7.0 + 0.01*i for i in range(200)]
 betas = [7.5 + 0.02*i for i in range(50)]
 
+alphas = np.linspace(0.5,3,6)
+betas = np.linspace(0.0,30,300)
+
+betas = np.linspace(7.0,9.0,100)
+alphas = np.linspace(0.1,10.0,100)
 
 
  
@@ -41,28 +46,36 @@ oscW = [ 0.166667, 0.333333 ]
 
 widths = list(range(2,12,2))
 
-NJOY_LEAPR = False
-fullRedo = True
+NJOY_LEAPR = True
 fullRedo = False
+fullRedo = True
 sabDELTA = getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     
 sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) for width in widths]
+for a in range(len(alphas)):
+    for b in range(len(betas)):
+        sabDELTA[a*len(betas)+b] *= np.exp(-betas[b])
+        for j in range(len(sabCONTINS)):
+            sabCONTINS[j][a*len(betas)+b] *= np.exp(-betas[b])
+
+
+
 
 # These parameters are for making sure that we only consider logicat alpha, beta
 # combinations. 
-A0 = 18.02; E = 0.01; kbT = 0.025851
+A0 = 0.9917; E = 0.50; kbT = 0.025851
 
-cMap = cmx.ScalarMappable(c.Normalize(0,10),plt.get_cmap('tab10')) #hot autumn tab10
+cMap = cmx.ScalarMappable(c.Normalize(0,10),plt.get_cmap('tab20')) #hot autumn tab10
 colors = [cMap.to_rgba(i) for i in range(2*len(widths)+1)]
 
-a = 9
-#plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],'.','discrete oscillator',2)
-plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],None,'discrete oscillator',2)
+a = 80
+print(alphas[a],betas[49],sabDELTA[a*len(betas)+49])
+plt_SAB_given_A(alphas,a,betas,sabDELTA,A0,E,kbT,colors[0],None,'delta',1.5)
 for i in range(len(widths)):
-    plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1],\
-                    None,'triangle, width '+ str('%.2E'%(widths[i]*0.00255))+' eV',2)
     #plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1],\
-    #                '.','triangle of width '+ str('%.4f'%(widths[i]*0.00255))+' eV',2)
+    #                None,str('%.2E'%(widths[i]*0.00255))+' eV',2)
+    plt_SAB_given_A(alphas,a,betas,sabCONTINS[i],A0,E,kbT,colors[i+1],\
+                    None,'width = '+str(widths[i]),1.5)
 
 
 
@@ -72,9 +85,6 @@ plt.legend(loc='best')
 ax = plt.gca()
 #plt.yscale('log')
 LEAPR_type = "NJOY LEAPR" if NJOY_LEAPR else "MY LEAPR"
-#plt.title('S(a,b) values for water, delta vs. various triangles.\n Generated using '+LEAPR_type+', for alpha = '+str(alphas[a]))
-ax.set_facecolor('xkcd:light grey blue')
-ax.set_facecolor('xkcd:off white')
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 plt.legend(loc='upper right')
 

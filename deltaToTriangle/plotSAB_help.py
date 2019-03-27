@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 
 
 def isValidABCombo(alpha,beta,A0,E,kbT):
+    if E+beta*kbT < 0:
+        return False
     a_min = (E**0.5 - (E+beta*kbT)**0.5)**2 / (A0*kbT)
     a_max = (E**0.5 + (E+beta*kbT)**0.5)**2 / (A0*kbT)
     return a_min < alpha < a_max
@@ -22,8 +24,10 @@ def plotBetaForVariousAlpha(alphaVals,betaVals,sab,A0,E,kbT,scalarMap,style,addL
                 validSab.append(a_i_b_all[b])
         if addLabel:
             plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a),marker=style,linewidth=1,markersize=0)
+            #plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color='orange',marker=style,linewidth=1,markersize=0)
         else:
             plt.plot(validBeta,validSab,color=scalarMap.to_rgba(a),marker=style,linestyle='--',linewidth=1,markersize=0)
+            #plt.plot(validBeta,validSab,color='orange',marker=style,linestyle='--',linewidth=1,markersize=0)
 
 
     #plt.legend(loc='best')
@@ -62,7 +66,8 @@ def plotErrorBetaForVariousAlpha(alphaVals,betaVals,sabGood,sabTest,A0,E,kbT,sca
         for b,beta in enumerate(betaVals):
             if isValidABCombo(alpha,beta,A0,E,kbT):
                 validBeta.append(beta)
-                validSab.append(100.0*(a_i_b_all_Test[b]-a_i_b_all_Good[b])/a_i_b_all_Good[b])
+                validSab.append(100.0*abs(a_i_b_all_Test[b]-a_i_b_all_Good[b])/\
+                        ((abs(a_i_b_all_Good[b])+abs(a_i_b_all_Test[b]))*0.5))
                 #validSab.append(abs(a_i_b_all_Test[b]-a_i_b_all_Good[b]))
         plt.plot(validBeta,validSab,label='alpha: '+str(alpha),color=scalarMap.to_rgba(a))
 

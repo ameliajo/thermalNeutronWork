@@ -257,7 +257,7 @@ axes = plt.gca()
 plt.xlabel("E' [eV]")
 plt.ylabel("Probability")
 
-#axes.set_xlim([1e-4,1e0])
+axes.set_xlim([4e-5,1e0])
 #axes.set_ylim([1e-3,1e3])
 
 

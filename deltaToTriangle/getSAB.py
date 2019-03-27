@@ -36,13 +36,13 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
             assert([abs(betaVals[i]-betas[i]) <= 1e-8 for i in range(len(betas))])
         # So we actually just collected ssm, which is S_non.sym(a,-b). 
         # S_non.sym(a,b) = e^-b S_non.sym(a,-b)
-        for a in range(len(alphas)):
-            for b in range(len(betas)):
-                # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
-                sab[a*len(betas)+b] *= np.exp(-betas[b])
+        #for a in range(len(alphas)):
+        #    for b in range(len(betas)):
+        #        # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
+        #        sab[a*len(betas)+b] *= np.exp(-betas[b])
 
-                # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
-                #sab[a*len(betas)+b] *= np.exp(betas[b]*0.5)
+        #        # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
+        #        #sab[a*len(betas)+b] *= np.exp(betas[b]*0.5)
 
 
         return sab
@@ -73,13 +73,13 @@ def getSAB(alphas,betas,rho,NJOY_LEAPR,fullRedo,width,oscE=None,oscW=None):
 
         # So we actually just collected ssm, which is S_non.sym(a,-b). 
         # S_non.sym(a,b) = e^b S_non.sym(a,-b)
-        for a in range(len(alphas)):
-            for b in range(len(betas)):
-                # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
-                sab[a*len(betas)+b] *= np.exp(-betas[b])
+        #for a in range(len(alphas)):
+        #    for b in range(len(betas)):
+        #        # This is to go from S_non.sym(a,-b) --> S_non.sym(a,b)
+        #        sab[a*len(betas)+b] *= np.exp(-betas[b])
 
-                # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
-                #sab[a*len(betas)+b] *= np.exp(betas[b]*0.5)
+        #        # This is to go from S_non.sym(a,b)  --> S_sym(a,b)
+        #        #sab[a*len(betas)+b] *= np.exp(betas[b]*0.5)
 
         return sab
 

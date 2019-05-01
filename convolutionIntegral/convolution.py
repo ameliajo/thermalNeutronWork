@@ -11,7 +11,9 @@ continRho = [0, .0005, .001, .002, .0035, .005, .0075, .01, .013, .0165, .02,  \
   .0525, .0515, .05042, .04934, .04822, .04706, .0459, .04478, .04366, .04288, \
   .04244, .042, 0.0]
 
-rhoBeta = np.arange(0,0.00255*len(continRho),0.00255)
+rhoEnergy = np.arange(0,0.00255*len(continRho),0.00255)
+kbT = 0.0255
+rhoBeta = [x/kbT for x in rhoEnergy]
 
 
 def getT1(continRho,alpha,rhoBeta):
@@ -31,7 +33,7 @@ def getT1(continRho,alpha,rhoBeta):
 
 
 
-def interpolate(xList,yList,x,lambda_s):
+def interpolate(xList,yList,x):
     for i in range(len(xList)-1):
         if (xList[i] <= x < xList[i+1]):
             m = (yList[i+1]-yList[i]) / (xList[i+1]-xList[i])
@@ -64,8 +66,8 @@ def convolve(beta,T1,Tlast,numBeta):
 
 def getConvergenceOfSum(alpha,beta,numIter,rhoBeta):
     inputT1,lambda_s = getT1(continRho,alpha,rhoBeta)
-    beta = rhoBeta[:]
-    T1 = [interpolate(rhoBeta,inputT1,abs(beta[i]),lambda_s) \
+    #beta = rhoBeta[:]
+    T1 = [interpolate(rhoBeta,inputT1,abs(beta[i])) \
             for i in range(len(beta))]
     Tn = T1[:]
     diffs = [0.0]*(numIter-1)
@@ -87,7 +89,7 @@ def getConvergenceOfSum(alpha,beta,numIter,rhoBeta):
         #diffs.append(aTerms*Tn[b])
         Tn = convolve(beta,T1,Tn,len(beta))
         n += 1
-        if (len(diffs)>5 and diffs[-1] < 1e-4):
+        if (len(diffs)>5 and diffs[-1] < 1e-6):
             return diffs
     return diffs
 
@@ -103,10 +105,11 @@ numBeta = 300
 beta = np.linspace(0,20,numBeta) 
 
 
-alphas = [0.1,0.2,0.5,1.0,2.0,2.5,3.0]
 alphas = [0.1,0.5,1.0,2.5,4.0,5.0,10.0]
 
+"""
 plotConvergence = True
+plotConvergence = False
 if plotConvergence:
     peakLocations = []
     convergenceLocations1 = []
@@ -151,9 +154,15 @@ if plotConvergence:
 
 
 
+"""
+numBeta = 500
+beta = np.linspace(0,20,numBeta) 
 
-plotContributions = True
+
+alphas = [0.1,0.2,0.5,1.0,2.0,2.5,3.0]
+alphas = [0.1,3.0]
 plotContributions = False
+plotContributions = True
 if plotContributions:
     for a,alpha in enumerate(alphas):
         diffs = getConvergenceOfSum(alpha,beta,numIter,rhoBeta)

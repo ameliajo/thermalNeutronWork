@@ -1,20 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from math import pi
-from getSAB import *
-from rho import continRho,oscE,oscW
+#from getSAB import *
+#from rho import continRho,oscE,oscW
 import random
-import matplotlib.colors as colors
-import matplotlib.cm as cmx
-import seaborn as sns  # for nicer graphics
-
-def prepPlot(alphas):
-    plt.clf()
-    cnorm = colors.Normalize(vmin=0,vmax=len(alphas)+2)
-    scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab20')) #hot autumn tab10
-    mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
-            [scalarMap.to_rgba(a) for a in range(len(alphas))])
-    return scalarMap, plt.contourf([[0,0],[0,0]], alphas, cmap=mymap)
+from plotHelp import *
+from sab import SAB
 
 
 def getFullSAB(alphas,betas,fullBetas,sabs): 
@@ -47,7 +37,7 @@ def getAlphaMinMaxIndices(E,beta,kb,T,A,alphas):
 def getValidBetasRange(A,E,T,fullBetas):
     kb = 8.6173303e-5
     betaMin, betaMax = -E/(kb*T), 20.0
-    if betaMin < fullBetas[0] or betaMax > fullBetas[-1]:
+    if betaMin < fullBetas[0] or betaMax > 1.1*fullBetas[-1]:
         print("May want to have more beta values")
     bMin = bMax  = len(fullBetas)
     for b in range(len(fullBetas)):
@@ -70,23 +60,12 @@ def intSABda(A,E,T,fullSAB,fullBetas,b):
     return denominator
 
 def calcBetaPDF(A,E,T,fullSAB,fullBetas,bMin,bMax):
-    delta0 = fullBetas[bMin+1]-fullBetas[bMin]
-    deltaN = fullBetas[bMax-1]-fullBetas[bMax-2]
-    denominator = intSABda(A,E,T,fullSAB,fullBetas,bMin)*delta0*0.5 +\
-                  intSABda(A,E,T,fullSAB,fullBetas,bMax-1)*deltaN*0.5
-    for b in range(bMin+1,bMax-1):
-        deltaL = fullBetas[b]-fullBetas[b-1]
-        deltaR = fullBetas[b+1]-fullBetas[b]
-        denominator += intSABda(A,E,T,fullSAB,fullBetas,b) * (deltaL+deltaR) * 0.5
-
-    eq14 = [ intSABda(A,E,T,fullSAB,fullBetas,b) / denominator \
-           for b in range(bMin,bMax-1)]
-    """
-    plt.plot(fullBetas[bMin:bMax-1],eq14)
-    plt.xlabel('beta'); plt.ylabel('beta PDF')
-    plt.show()
-    """
-    return eq14
+    integral_SAB_da = [intSABda(A,E,T,fullSAB,fullBetas,b) for b in range(bMin,bMax-1)]
+    denominator = np.trapz(integral_SAB_da,x=fullBetas[bMin:bMax-1])
+    # This is Eq.14 from Pavlou and Ji paper:
+    #     On-the-fly sampling of temperature-dependent thermal neutron 
+    #     scattering data for Monte Carlo simulations
+    return [ val / denominator for val in integral_SAB_da ]
 
 
 
@@ -100,17 +79,12 @@ def calcBetaCDF(betas,eq14,bMin):
 
 
 
-
 def getBetaCDF(A,E,T,fullSAB,fullBetas):
+    # These are the indices of the min/max allowed beta values
     bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
     betaPDF = calcBetaPDF(A,E,T,fullSAB,fullBetas,bMin,bMax)
     betaCDF = calcBetaCDF(fullBetas,betaPDF,bMin)
-    """
-    plt.plot(fullBetas[bMin:bMax-1],betaCDF)
-    plt.xlabel('beta'); plt.ylabel('beta CDF')
-    plt.show()
-    exit() 
-    """
+    #plotBetaCDF(fullBetas,betaCDF,bMin,bMax)
     return fullBetas[bMin:bMax-1],betaCDF
 
 
@@ -126,142 +100,126 @@ def binarySearch(vec,val):
            binarySearch(vec[halfway:],val) + halfway
 
 
+def findLocation(vec,val):
+    for i in range(len(vec)-1):
+        if vec[i] <= val and val < vec[i+1]:
+            return i
+
+
+def binarySearch2(vec,val):
+    if len(vec) == 1:
+        return 0
+    halfway = int(len(vec)*0.5)
+    if val < vec[halfway]:
+        return binarySearch2(vec[:halfway],val)
+    else:
+        return halfway+binarySearch2(vec[halfway:],val)
+
+
+
+
+
 
 def sampleCDF(x,CDF):
     xsi = random.random()
-    i = binarySearch(CDF,xsi)
+    i = binarySearch2(CDF,xsi)
+    assert(CDF[i]<=xsi<=CDF[i+1])
     frac  = (xsi-CDF[i])/(CDF[i+1]-CDF[i])
-    return i,frac*(x[i+1]-x[i])+x[i],xsi
+    return i,frac*(x[i+1]-x[i])+x[i]
 
-def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas,aMin):
-    denominator = 0.0
-    for a in range(nAlpha-1):
-        sabL = fullSAB[a*nFullBetas+index]
-        sabR = fullSAB[(a+1)*nFullBetas+index]
-        denominator += (sabL+sabR)*0.5*(alphas[a+1]-alphas[a])
+def getAlphaCDF(nAlpha,nFullBetas,index,fullSAB,alphas):
 
-    alphaPDF = [fullSAB[a*nFullBetas+index]/denominator \
-                for a in range(nAlpha)]
+    alphaPDF = [fullSAB[a*nFullBetas+index] for a in range(nAlpha)]
+    denom = np.trapz(alphaPDF,x=alphas)
+    alphaPDF = [x/denom for x in alphaPDF]
 
     alphaCDF = [0.0]*nAlpha
     for a in range(1,nAlpha):
         alphaCDF[a] = alphaCDF[a-1]+(alphaPDF[a]+alphaPDF[a-1]) * \
                       0.5*(alphas[a]-alphas[a-1])
+    #plotAlphaCDF(alphas,alphaCDF)
     return alphaCDF
 
 A, T = 1.0, 296.0
 kb = 8.6173303e-5
 
-nAlpha, nBeta = 50, 100
-alphas = list(np.linspace(0.001,3,nAlpha))
-betas  = list(np.logspace(-6,2.1,nBeta))
-
-nAlpha, nBeta = 50, 100
-alphas = list(np.linspace(0.001,3,nAlpha))
-betas  = list(np.logspace(-6,2.1,nBeta))
-
 nAlpha, nBeta = 100, 1000
-alphas = list(np.linspace(1.0,32.0,nAlpha))
 alphas = list(np.linspace(0.0,32.0,nAlpha))
 betas  = list(np.logspace(-6,1.3,nBeta))
-print(kb*T)
-
-
-
-
 
 useNJOY  = True
 width    = None 
-fullRedo = True
+#fullRedo = True
 fullRedo = False  
 
 
-SAB = getSAB(alphas,betas,T,continRho,useNJOY,fullRedo,width,oscE,oscW) 
+## This reads in the S(a,b) from NJOY. The S(a,b) that LEAPR returns is the 
+## non-symmetric form, and they give the -b side of it. 
+## S_sym(a,b)   = exp(b/2) * S_n.sym(a,b)
+## S_n.sym(a,b) = exp(-b)  * S_n.sym(a,-b)
+# SAB = getSAB(alphas,betas,T,continRho,useNJOY,fullRedo,width,oscE,oscW) 
 
-"""
-scalarMap, colorBar = prepPlot(alphas)
-for a in range(0,nAlpha):
-    plt.plot(betas,[SAB[a*len(betas)+b] for b in range(len(betas))],label=str("alpha = "+"%.3E"%alphas[a]),color=scalarMap.to_rgba(a),alpha=0.6)
+#with open('sab.py', 'w') as f:
+#    f.write("sab = [")
+#    for sabVal in SAB[:-1]:
+#        f.write("%s, " % sabVal)
+#    f.write("%s ]" % SAB[-1])
+plotSAB(alphas,betas,SAB,'S_n.sym(a,-b)')
+exit()
 
-plt.colorbar(colorBar).ax.set_ylabel('alpha')
-plt.yscale('log')
-plt.xlabel('beta'); plt.ylabel('S_n.sym(a,-b)')
-plt.show()
-"""
-
+## Reflect beta so that we have all positive and negative betas
+## Fill out full S(a,b_ so that it's defined for positive and negative betas
 fullBetas = [-x for x in betas[1:]][::-1] + betas
 fullSAB = getFullSAB(alphas,betas,fullBetas,SAB)
-
-"""
-scalarMap, colorBar = prepPlot(alphas)
-for a in range(0,nAlpha):
-    plt.plot(fullBetas,[fullSAB[a*len(fullBetas)+b] for b in range(len(fullBetas))],label=str("alpha = "+"%.3E"%alphas[a]),color=scalarMap.to_rgba(a),alpha=0.4)
-plt.colorbar(colorBar).ax.set_ylabel('alpha')
-plt.yscale('log')
-plt.xlabel('beta'); plt.ylabel('S_n.sym(a,b)')
-plt.show()
-"""
+# plotSAB(alphas,fullBetas,fullSAB,'S_n.sym(a,b)')
 
 
-N = int(5e6)
+# How many neutrons do you want to sample for each energy?
+N = int(5e5)
 
+# Initial neutron energy
 Energies = [0.0005,0.0253,0.2907,0.95,3.12]
-#Energies = [3.12]
-Energies = [0.0255]
-xsiVals = []
-betaVals = []
 
 for i,E in enumerate(Energies):
-    #break
-    print("E = ",E)
-
-    
-    bMin,bMax = getValidBetasRange(A,E,T,fullBetas)
+    # Get beta CDF
     CDF_beta_vals, betaCDF = getBetaCDF(A,E,T,fullSAB,fullBetas)
-
     E_out_vec = []
 
-    xsi_Vals = []
     for n in range(N):
-        if n%50000 == 0:
-            print(n)
-        index,beta,xsi = sampleCDF(CDF_beta_vals,betaCDF)
-        xsiVals.append(xsi)
-        betaVals.append(beta)
-
-        """
-        aMin, aMax = getAlphaMinMaxIndices(E,beta,kb,T,A,alphas)
-        alphaCDF = getAlphaCDF(nAlpha,len(fullBetas),index,fullSAB,alphas,aMin)
+        # Sample from beta CDF
+        index,beta = sampleCDF(CDF_beta_vals,betaCDF)
+        # For this beta value, get our alpha CDF
+        alphaCDF = getAlphaCDF(nAlpha,len(fullBetas),index,fullSAB,alphas)
+        
         # If the valid alpha values for this chosen beta are not going to occur
         # we should just continue
+        aMin, aMax = getAlphaMinMaxIndices(E,beta,kb,T,A,alphas)
         if (alphaCDF[aMax] < 1e-12): continue
+
+        # Subtrack out the non-physical values
         H = [None]*nAlpha
         for a in range(nAlpha):
             if   (alphas[a] <= alphas[aMin]): H[a] = 0
             elif (alphas[a] >= alphas[aMax]): H[a] = 1
-            else: 
-                H[a] = ( (alphaCDF[a]-alphaCDF[aMin]) / \
-                         (alphaCDF[aMax]-alphaCDF[aMin]) )
+            else:  H[a] = ( (alphaCDF[a]-alphaCDF[aMin]) / \
+                            (alphaCDF[aMax]-alphaCDF[aMin]) )
         index,alpha = sampleCDF(alphas,H)
-        """
 
         E_out_vec.append((beta*kb*T+E))
-    plt.hist(E_out_vec,normed=True,bins=np.logspace(-4.5,0,80),alpha=0.3)
-    print(min(E_out_vec),min(xsiVals),min(betaVals))
-    #plt.hist(E_out_vec,normed=True,alpha=0.3)
 
+    plt.hist(E_out_vec,density=True,bins=np.logspace(-4.5,0,80),alpha=0.3)
+
+"""
 plt.gca().set_xscale("log")
 plt.yscale('log', nonposy='clip')
 axes = plt.gca()
 plt.xlabel("E' [eV]")
 plt.ylabel("Probability")
 
-axes.set_xlim([4e-5,1e0])
-#axes.set_ylim([1e-3,1e3])
+axes.set_xlim([4e-5,1e1])
 
 
 plt.show()
-"""
 """
 
 

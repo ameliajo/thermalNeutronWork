@@ -99,13 +99,14 @@ def getXS_from_SAB(sab,alphas,betas,E,kb,T,Ep_vec,mu_vec,A):
 
 
 if __name__=="__main__":
+    plot_Ep_mu = True
     plot_Ep_mu = False
-    plot_Ep_Width = True
     plot_Ep_Width = False
-    plot_Ep_Width_pct_errors = True
+    plot_Ep_Width = True
     plot_Ep_Width_pct_errors = False
-    plot_Ep_errors = False
+    plot_Ep_Width_pct_errors = True
     plot_Ep_errors = True
+    plot_Ep_errors = False
     
     xs_bound = 20.449
     kb = 8.61733e-5

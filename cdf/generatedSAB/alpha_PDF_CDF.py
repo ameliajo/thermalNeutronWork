@@ -25,11 +25,7 @@ def calcSym(alpha,beta):
 def getAlphaMinMax(E,beta,kb,T,A):
     aMin = ( (E)**0.5 - (E+beta*kb*T)**0.5 )**2 / ( A*kb*T )
     aMax = ( (E)**0.5 + (E+beta*kb*T)**0.5 )**2 / ( A*kb*T )
-    print(aMin,aMax)
     return aMin,aMax
-    #aMin = 0.003498
-    #aMax = 88.22865
-    #return 0.00349820, 88.228649
 
 def getAlphaRange(E,beta,T,A,alphas):
     kb = 8.6173303e-5
@@ -37,7 +33,7 @@ def getAlphaRange(E,beta,T,A,alphas):
     alphas = [x for x in alphas if aMin <= x <= aMax]
     return alphas
 
-def calcAlphaPDF(A,E,t,beta,alphas,n_beta):
+def calcAlphaPDF(A,E,t,alphas,n_beta):
     denominator = 0.0
     for a in range(len(alphas)-1):
         sabL = getSABval(sabs[t],a,63,n_beta)
@@ -59,16 +55,22 @@ def PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta):
     alpha_vecs, eq15_vecs, eq16_vecs = [], [], []
     for t in range(len(temps)):
         alphas = getAlphaRange(E,beta,temps[t],A,alphas)
-        eq15 = calcAlphaPDF(A=A,E=E,t=t,beta=beta,alphas=alphas,n_beta=n_beta)
+        eq15 = calcAlphaPDF(A,E,t,alphas,n_beta)
         alpha_vecs.append(alphas)
         eq15_vecs.append(eq15)
         eq16 = calcAlphaCDF(eq15,alphas)
         eq16_vecs.append(eq16)
 
     for i in range(len(temps)): plt.plot(alpha_vecs[i],eq15_vecs[i])
-    plt.show()
+    #plt.show()
 
-    for i in range(len(temps)): plt.plot(alpha_vecs[i],eq16_vecs[i])
+
+    #for i in range(len(temps)): 
+    #    print(alpha_vecs[i][int(len(alpha_vecs[i])*0.5)],len(alpha_vecs[i]))
+    #return [eq15_vecs[i][32] for i in range(len(temps))]
+
+
+    #for i in range(len(temps)): plt.plot(alpha_vecs[i],eq16_vecs[i])
     #plt.show()
 
 
@@ -82,13 +84,38 @@ sabs = [sab_296,sab_475,sab_650,sab_825,sab_1000]
 n_beta = len(betas)
 
 
-A = 18.0
-E = 10.0 
+A = 1.0
+E = 0.025
 
-# A with 18 and E with 10 looks great
-beta = 10
-beta = betas[63]
-PDF_CDF_at_various_temps(A=A,E=E,temps=temps,beta=beta,alphas=alphas,n_beta=n_beta)
+beta = betas[50]
+beta = betas[0]
+#print(beta)
+
+output = PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta)
+beta = betas[len(betas)-1]
+output = PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta)
+#print(output)
+plt.show()
+
+"""
+
+
+alphaConst = [list() for x in temps]
+#print(alphaConst)
+for beta in betas:
+    output = PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta)
+    for t in range(len(temps)):
+        alphaConst[t].append(output[t])
+
+    #break
+
+print(alphaConst[0])
+for t in range(len(temps)):
+    plt.plot(betas, alphaConst[t],label=str(temps[t]))
+plt.show()
+
+
+"""
 
 
 

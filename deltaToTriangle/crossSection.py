@@ -117,8 +117,8 @@ if __name__=="__main__":
     widths = list(range(2,12,2))
 
     NJOY_LEAPR = True
-    fullRedo = True
     fullRedo = False
+    fullRedo = True
     sabDELTA   =  getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,None,oscE,oscW)
     sabCONTINS = [getSAB(alphas,betas,continRho,NJOY_LEAPR,fullRedo,width,oscE,oscW) \
                   for width in widths]

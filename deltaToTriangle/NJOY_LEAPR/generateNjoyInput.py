@@ -39,6 +39,7 @@ def generateNjoyInput(fileName,alphaVals,betaVals,phononDist,deltaFuncs):
         if deltaFuncs:
             f.write(\
              "0.0 0. 0.5 / "+str('\n')+\
+             #"0.055556 0. 0.444444 / "+str('\n')+\
              " 2/"+str('\n')+\
              " .204 .4794/"+str('\n')+\
              " .166667 .333333/"+str('\n')+\
@@ -47,6 +48,7 @@ def generateNjoyInput(fileName,alphaVals,betaVals,phononDist,deltaFuncs):
         else:
             f.write(\
              "0.0 0. 1.0 / "+str('\n')+\
+             #"0.111112 0. 0.888888 / "+str('\n')+\
              " 0/"+str('\n')+\
              "/"+str('\n')+\
             "stop"+str('\n'))

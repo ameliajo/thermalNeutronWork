@@ -5,7 +5,7 @@ import numpy as np
 rawX = []
 rawY = []
 
-with open("ane_damian_data.txt") as f:
+with open("damian_contin_data.txt") as f:
     vals = f.readlines()
     for val in vals:
         valVec = val.split()
@@ -16,7 +16,7 @@ with open("ane_damian_data.txt") as f:
 rawX2 = []
 rawY2 = []
 
-with open("ane_damian2_data.txt") as f:
+with open("damian_discrete_data.txt") as f:
     vals = f.readlines()
     for val in vals:
         valVec = val.split()

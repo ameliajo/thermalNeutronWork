@@ -38,7 +38,7 @@ def calcAlphaCDF(eq15,alphas):
         eq16[a] = eq16[a-1]+(eq15[a]+eq15[a-1])*0.5*(alphas[a]-alphas[a-1])
     return eq16
 
-def PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabs,scalarMap=None):
+def PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabs):
     alpha_vecs, eq15_vecs, eq16_vecs = [], [], []
     for t in range(len(temps)):
         theseAlphas = getAlphaRange(E,beta,temps[t],A,alphas)
@@ -48,11 +48,11 @@ def PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabs,scalarMap=N
         eq16_vecs.append(calcAlphaCDF(eq15,theseAlphas))
 
     for i in range(len(temps)): 
-        plt.plot(alpha_vecs[i],eq15_vecs[i],label=str(temps[i])+' K',color=scalarMap.to_rgba(i))
+        plt.plot(alpha_vecs[i],eq15_vecs[i],label=str(temps[i])+' K')
     plt.legend(loc='best')
     plt.xlabel('alpha')
     plt.ylabel('PDF')
-    #plt.show()
+    plt.show()
     return
 
     for i in range(len(temps)): 
@@ -73,16 +73,14 @@ width = None
 temps = [296.0,475.0,650.0,825.0,1000.0]   # Water
 
 
-#index = 25
-#beta = betas[index]
-#print("BETA",beta)
-#fullRedo = False
+index = 25
+beta = betas[index]
+print("BETA",beta)
+fullRedo = False
 
-#sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
-#            width=width,oscE=oscE,oscW=oscW) for T in temps]
-#PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabsMINE)
-
-
+sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
+            width=width,oscE=oscE,oscW=oscW) for T in temps]
+PDF_CDF_at_various_temps(A,E,temps,beta,alphas,n_beta,index,sabsMINE)
 
 
 
@@ -95,7 +93,9 @@ temps = [296.0,475.0,650.0,825.0,1000.0]   # Water
 
 
 
-def PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabs,scalarMap=None,style=None,label=False):
+"""
+
+def PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabs,color,label):
     alpha_vecs, eq15_vecs, eq16_vecs = [], [], []
     for t in range(len(temps)):
         theseAlphas = getAlphaRange(E,beta,temps[t],A,alphas)
@@ -105,57 +105,36 @@ def PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabs,scala
         eq16_vecs.append(calcAlphaCDF(eq15,theseAlphas))
 
     for i in range(len(temps)): 
-        if label:
-            plt.plot(alpha_vecs[i],eq15_vecs[i],color=scalarMap.to_rgba(i),linestyle=style,label=str(temps[i]))
-        else:
-            plt.plot(alpha_vecs[i],eq15_vecs[i],color=scalarMap.to_rgba(i),linestyle=style)
-        #plt.fill(alpha_vecs[i],eq15_vecs[i],color=scalarMap.to_rgba(i),linestyle=style,alpha=0.1)
-    plt.xlabel('alpha')
-    plt.ylabel('PDF')
-    plt.legend(loc='best')
-
-    return
-
-    for i in range(len(temps)): 
-        plt.plot(alpha_vecs[i],eq16_vecs[i])
-    #plt.legend(loc='best')
+        plt.plot(alpha_vecs[i],eq16_vecs[i],color=color,label=label,linewidth=2)
     plt.xlabel('alpha')
     plt.ylabel('CDF')
-    #plt.show()
+    #plt.legend(loc='best')
+plt.rcParams.update({'font.size': 12})
+
 
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
-cnorm = colors.Normalize(vmin=0,vmax=len(temps))
+cnorm = colors.Normalize(vmin=0,vmax=10)
 scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('tab10')) #hot autumn tab10
+scalarMap = cmx.ScalarMappable(norm=cnorm,cmap=plt.get_cmap('rainbow')) #hot autumn tab10
+mymap = colors.LinearSegmentedColormap.from_list('funTestColors',\
+        [scalarMap.to_rgba(a) for a in range(11)])
+colorBar = plt.contourf([[0,0],[0,0]], betas, cmap=mymap)
+plt.clf()
 
-#temps = [296.0,650.0,1000.0]   # Water
-#temps = [296.0,1000.0]   # Water
-#temps = [296.0,650.0]   # Water
-
-index = 25
-beta = betas[index]
-print("BETA",beta)
-fullRedo = False
-
-sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
-            width=width,oscE=oscE,oscW=oscW) for T in temps]
-PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabsMINE,scalarMap,"-.",True)
+temps = [650.0]   # Water
 
 
-index = 50
-beta = betas[index]
-print("BETA",beta)
-sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
-            width=width,oscE=oscE,oscW=oscW) for T in temps]
-PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabsMINE,scalarMap,"-",False)
+print(len(betas))
+for i,index in enumerate([10,20,30,40,50,60,70,80,90,99]):
+    beta = betas[index]
+    print("BETA",beta)
+    sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
+                width=width,oscE=oscE,oscW=oscW) for T in temps]
+    PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabsMINE,scalarMap.to_rgba(i),'beta = '+str(int(beta)))
 
-index = 75
-beta = betas[index]
-print("BETA",beta)
-sabsMINE = [getSAB(alphas,betas,T,continRho,NJOY_LEAPR=runNJOY,fullRedo=False,\
-            width=width,oscE=oscE,oscW=oscW) for T in temps]
-PDF_CDF_at_various_temps_quiet(A,E,temps,beta,alphas,n_beta,index,sabsMINE,scalarMap,":",False)
-
+ax = plt.gca()
+plt.colorbar(colorBar,format='%.0f').ax.set_ylabel('beta values')
 
 
 
@@ -163,6 +142,7 @@ plt.show()
 
 
 
+"""
 
 
 
